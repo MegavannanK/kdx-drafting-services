@@ -21,7 +21,7 @@ function FitCamera({ exploded, resetKey }: { exploded: boolean; resetKey: number
   return null;
 }
 
-function Beam({ start, end, color = '#bfc4c3', width = .17, depth = .28, wireframe }: Member & { wireframe: boolean }) {
+export function Beam({ start, end, color = '#bfc4c3', width = .17, depth = .28, wireframe }: Member & { wireframe: boolean }) {
   const { position, quaternion, length } = useMemo(() => {
     const a = new THREE.Vector3(...start), b = new THREE.Vector3(...end);
     const direction = b.clone().sub(a);

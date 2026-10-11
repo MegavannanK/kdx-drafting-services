@@ -30,6 +30,14 @@ The site is configured as a static export. Deploy the generated `out/` directory
 - `src/lib/projects.ts`: supplied project names and share tokens.
 - `src/lib/model-metadata.json`: project/model IDs resolved from the supplied share links.
 
+## Scroll-driven process story
+
+The pinned `ScrollJourney` section uses native page scrolling to control a Three.js sequence: a plan lifts into a portal frame, the steel members assemble, a bolted connection slides into close-up, and the complete structure returns for delivery. Scrolling backwards reverses the sequence. Chapter buttons provide direct navigation, with a Skip link to leave the sequence.
+
+Rendering is lazy-loaded and pauses out of view. Reduced-motion preferences replace the long pinned scroll with selectable chapters and immediate state changes. The scene is an illustrative process study, separate from the original Trimble project models.
+
+Edit `src/components/scroll-journey.tsx` for chapter copy and timing, `scroll-journey-scene.tsx` for geometry and camera motion, and `scroll-journey.css` for layout.
+
 ## Project models
 
 Each supplied share link has been resolved to its Trimble project and model ID. The viewer uses Trimble's documented `stoken` query parameter to load the original model. Only one external viewer is mounted at a time, after the visitor selects a project.
