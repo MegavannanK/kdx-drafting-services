@@ -25,7 +25,9 @@ The site is configured as a static export. Deploy the generated `out/` directory
 
 Live site: https://megavannank.github.io/kdx-drafting-services/
 
-The workflow in `.github/workflows/deploy-pages.yml` checks and builds the site, then deploys it on every push to `main`. In repository Settings → Pages, choose **GitHub Actions** as the publishing source.
+The site is published from the root of the `gh-pages` branch. In repository Settings → Pages, choose **Deploy from a branch**, select `gh-pages`, and use `/ (root)`.
+
+A ready-to-use Actions workflow is saved in `deployment/github-pages-workflow.yml`. To enable automatic deployment later, move it to `.github/workflows/deploy-pages.yml` using credentials with workflow permission, push to `main`, and switch the Pages source to **GitHub Actions**.
 
 To build locally with the GitHub Pages path:
 
