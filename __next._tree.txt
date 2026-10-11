@@ -1,0 +1,4 @@
+:HL["/kdx-drafting-services/_next/static/chunks/0zpp3mhq33fls.css","style"]
+:HL["/kdx-drafting-services/_next/static/chunks/252-7x9d-2_ql.css","style"]
+1:[["children",{"s":"__PAGE__","h":160}]]
+0:{"b":"URvZEel70WDBLAxaxlgb-","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
