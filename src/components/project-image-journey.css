@@ -1,0 +1,29 @@
+.project-image-journey{height:600svh;margin:0 -6.18% 56px}
+.project-image-visual{position:absolute;right:5.5%;top:29%;width:51%;height:49%;z-index:2}
+.project-image-frame{position:relative;width:100%;height:100%;background:#fff;overflow:hidden;border:1px solid #54745b;box-shadow:0 24px 70px #0002}
+.project-image-panel{position:absolute;inset:15px;margin:0;will-change:transform,opacity}
+.project-image-panel img{width:100%;height:100%;object-fit:contain;display:block}
+.project-image-corner{position:absolute;width:18px;height:18px;z-index:8;pointer-events:none;border-color:#e18048;border-style:solid}
+.corner-top{top:7px;left:7px;border-width:1px 0 0 1px}
+.corner-bottom{bottom:7px;right:7px;border-width:0 1px 1px 0}
+.project-image-copy{width:36%}
+.project-image-copy h2{font-size:clamp(32px,3.4vw,52px)}
+.project-image-controls{grid-template-columns:repeat(7,minmax(0,1fr));gap:3%}
+.project-image-controls button{gap:10px}
+.project-image-controls button>i{margin-right:0}
+.project-image-journey[data-reduced-motion=true]{height:100svh;min-height:690px}
+.project-image-journey[data-reduced-motion=true] .project-image-panel{will-change:auto}
+@media(max-width:1000px){.project-image-copy h2{font-size:37px}.project-image-controls button{font-size:11px;gap:7px}}
+@media(max-width:650px){
+  .project-image-journey{margin-inline:-6.82%;height:560svh;margin-bottom:32px}
+  .project-image-copy{width:88%}
+  .project-image-copy h2{font-size:34px}
+  .project-image-visual{right:6%;top:auto;bottom:22%;width:88%;height:34%}
+  .project-image-panel{inset:8px}
+  .project-image-annotation{bottom:17%}
+  .project-image-controls{gap:10px}
+  .project-image-controls button{font-size:9px}
+  .project-image-journey[data-reduced-motion=true]{min-height:750px}
+}
+@media(max-height:680px) and (min-width:651px){.project-image-visual{top:25%;height:48%}}
+@media(prefers-reduced-motion:reduce){.project-image-journey{height:100svh;min-height:690px}.project-image-stage{position:relative}.project-image-panel{transform:none!important;will-change:auto}}

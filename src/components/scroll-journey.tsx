@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { ArrowDown, ArrowUpRight, Check, MoveDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import './scroll-journey.css';
+import { projects } from '@/lib/projects';
 
 const JourneyScene = dynamic(() => import('./scroll-journey-scene'), { ssr: false, loading: () => <div className="journey-loading">Preparing the structure<span /></div> });
 
@@ -14,7 +15,7 @@ export const chapters = [
   { label: 'Deliver', heading: <>From digital precision.<br />To physical possibility.</>, body: 'The model becomes a connected set of drawings and production data. One clear package for the next stage of your build.', output: 'NC DATA / DXF / IFC', detail: '04 / READY FOR FABRICATION', title: 'Prepare the fabrication package' },
 ];
 
-export default function ScrollJourney() {
+export default function ScrollJourney({ onExploreProject }: { onExploreProject: () => void }) {
   const section = useRef<HTMLElement>(null);
   const progress = useRef(0);
   const progressBar = useRef<HTMLDivElement>(null);
@@ -25,7 +26,10 @@ export default function ScrollJourney() {
 
   useEffect(() => {
     const media = matchMedia('(prefers-reduced-motion: reduce)');
-    const onPreference = () => setReduced(media.matches);
+    const onPreference = () => {
+      setReduced(media.matches);
+      if (media.matches) { progress.current = .125; setChapter(0); }
+    };
     onPreference(); media.addEventListener('change', onPreference);
     const observer = new IntersectionObserver(([entry]) => { setActive(entry.isIntersecting); if (entry.isIntersecting) setHasEntered(true); }, { rootMargin: '180px' });
     if (section.current) observer.observe(section.current);
@@ -68,7 +72,7 @@ export default function ScrollJourney() {
         <span className="journey-chapter-count">0{chapter + 1}<span>/ 04</span></span>
         <h2>{chapters[chapter].heading}</h2><p>{chapters[chapter].body}</p>
         <div className="journey-output">{chapter === 3 ? <Check size={13} /> : <span className="output-cross">+</span>}{chapters[chapter].output}</div>
-        {chapter === 3 && <a className="journey-cta" href="#projects">Explore the real projects <ArrowUpRight size={15} /></a>}
+        <button className="journey-cta" onClick={onExploreProject}>Explore {projects[0].name} in 3D <ArrowUpRight size={15} /></button>
       </div>
       <div className="journey-annotation"><span /><div>{chapters[chapter].detail}<small>{chapter === 2 ? 'BOLTED END-PLATE / ILLUSTRATIVE DETAIL' : 'STEEL DETAILING / PROCESS VISUALISATION'}</small></div></div>
       <div className="journey-bottom">

@@ -1,3 +1,5 @@
+import modelMetadata from './model-metadata.json';
+
 export type Project = { id: string; name: string; category: 'Commercial' | 'Residential' | 'Industrial'; token: string; viewerUrl?: string };
 export const projects: Project[] = [
   { id: 'PRJ2652', name: 'Weston Shed', category: 'Commercial', token: '8O8wIkFrtv1q5hVThvrP6Mr-TrM8d6jS1Cr9ZHw3_ocT5n0bkgKVMjPRxc_LZWtQ' },
@@ -12,3 +14,10 @@ export const projects: Project[] = [
   { id: 'PRJ2669', name: '4 Slade Avenue, Lindfield', category: 'Residential', token: 'O4PUlhzje-3IQHyglAsK4-aDfXzbABvOHnt_vaYgP9IspJYKvayM7oUh0quhvY1L' },
 ];
 export const shareUrl = (project: Project) => `https://app32.connect.trimble.com/tc/api/2.0/s/${project.token}`;
+
+export const embedUrl = (project: Project) => {
+  const meta = (modelMetadata as Record<string, { projectId: string; modelId: string }>)[project.id];
+  return meta
+    ? `https://web.connect.trimble.com/projects/${encodeURIComponent(meta.projectId)}/viewer/3d/?embed=true&modelId=${encodeURIComponent(meta.modelId)}&origin=app32.connect.trimble.com&stoken=${encodeURIComponent(project.token)}`
+    : `https://3d.connect.trimble.com/?stoken=${encodeURIComponent(project.token)}`;
+};

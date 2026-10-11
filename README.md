@@ -21,6 +21,20 @@ npm run build
 
 The site is configured as a static export. Deploy the generated `out/` directory to a static web host. `next start` does not serve a static export; use a static server for production preview.
 
+### GitHub Pages
+
+Live site: https://megavannank.github.io/kdx-drafting-services/
+
+The workflow in `.github/workflows/deploy-pages.yml` checks and builds the site, then deploys it on every push to `main`. In repository Settings → Pages, choose **GitHub Actions** as the publishing source.
+
+To build locally with the GitHub Pages path:
+
+```sh
+NEXT_PUBLIC_BASE_PATH=/kdx-drafting-services npm run build
+```
+
+Local development keeps the root path. The Pages build applies the repository path to JavaScript, CSS, and project images.
+
 ## Main files
 
 - `src/app/page.tsx`: page content, project filters, navigation, enquiry flow.
@@ -34,9 +48,13 @@ The site is configured as a static export. Deploy the generated `out/` directory
 
 The pinned `ScrollJourney` section uses native page scrolling to control a Three.js sequence: a plan lifts into a portal frame, the steel members assemble, a bolted connection slides into close-up, and the complete structure returns for delivery. Scrolling backwards reverses the sequence. Chapter buttons provide direct navigation, with a Skip link to leave the sequence.
 
-Rendering is lazy-loaded and pauses out of view. Reduced-motion preferences replace the long pinned scroll with selectable chapters and immediate state changes. The scene is an illustrative process study, separate from the original Trimble project models.
+Rendering is lazy-loaded and pauses out of view. Reduced-motion preferences replace the long pinned scroll with selectable chapters and immediate state changes. The animated structure is an illustrative process study. An **Explore Weston Shed in 3D** button in every chapter opens the original shared project in the Trimble viewer.
 
 Edit `src/components/scroll-journey.tsx` for chapter copy and timing, `scroll-journey-scene.tsx` for geometry and camera motion, and `scroll-journey.css` for layout.
+
+## Location
+
+A lazy-loaded Google Maps embed shows Nowra, NSW 2541, the locality published on the KDX website, with a direct Google Maps link. It does not claim an exact office address or business listing. No Maps API key is required for this locality embed.
 
 ## Project models
 
@@ -61,3 +79,9 @@ Visual direction reference: https://terafab.ai/
 Trimble embed documentation: https://components.connect.trimble.com/trimble-connect-workspace-api/index.html
 
 Fonts are loaded from Google Fonts, with local system fallbacks. Reduced-motion preferences disable automatic scene rotation and decorative animations. The model renderer pauses when outside the viewport.
+
+## Project image scroll gallery
+
+The Projects section includes a pinned, reversible image sequence using the seven original project images from the KDX website. Native scrolling drives subtle zoom, lift, and crossfade transitions. Numbered controls jump to each image; Skip gallery continues to the model explorer. Reduced-motion preferences use immediate image selection without the extended scroll. Images are stored locally in `public/images/projects/`, preserving their original aspect ratios and watermarks. Archive numbers indicate source order, not associations with the named Trimble models.
+
+Edit `src/components/project-image-journey.tsx` and `project-image-journey.css` for content and presentation.

@@ -1,8 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { ExternalLink, Maximize2, RotateCcw, X } from 'lucide-react';
-import { shareUrl, type Project } from '@/lib/projects';
-import modelMetadata from '@/lib/model-metadata.json';
+import { embedUrl, shareUrl, type Project } from '@/lib/projects';
 
 export default function ProjectViewer({ project, onClose }: { project: Project; onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -11,8 +10,7 @@ export default function ProjectViewer({ project, onClose }: { project: Project; 
   const [loaded, setLoaded] = useState(false);
   const [slow, setSlow] = useState(false);
   const [fullScreenError, setFullScreenError] = useState(false);
-  const meta = (modelMetadata as Record<string, { projectId: string; modelId: string }>)[project.id];
-  const src = meta ? `https://web.connect.trimble.com/projects/${encodeURIComponent(meta.projectId)}/viewer/3d/?embed=true&modelId=${encodeURIComponent(meta.modelId)}&origin=app32.connect.trimble.com&stoken=${encodeURIComponent(project.token)}` : `https://3d.connect.trimble.com/?stoken=${encodeURIComponent(project.token)}`;
+  const src = embedUrl(project);
   useEffect(() => { const previousFocus = document.activeElement as HTMLElement | null; dialog.current?.showModal(); const oldOverflow = document.body.style.overflow; document.body.style.overflow = 'hidden'; return () => { document.body.style.overflow = oldOverflow; previousFocus?.focus(); }; }, []);
   useEffect(() => { setLoaded(false); setSlow(false); const timer = setTimeout(() => setSlow(true), 15000); return () => clearTimeout(timer); }, [project.id, reload]);
   return <dialog className="project-dialog" ref={dialog} onCancel={onClose} aria-labelledby="viewer-title" onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
