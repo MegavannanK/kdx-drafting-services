@@ -1,4 +1,4 @@
-:HL["/kdx-drafting-services/_next/static/chunks/0zpp3mhq33fls.css","style"]
-:HL["/kdx-drafting-services/_next/static/chunks/252-7x9d-2_ql.css","style"]
+:HL["/kdx-drafting-services/_next/static/chunks/1zpwu7v6_d38y.css","style"]
+:HL["/kdx-drafting-services/_next/static/chunks/3jjscgmwo2s8b.css","style"]
 1:[["children",{"s":"__PAGE__","h":160}]]
-0:{"b":"URvZEel70WDBLAxaxlgb-","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"-oNeAiwyFHKrKi3S5NsY1","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
