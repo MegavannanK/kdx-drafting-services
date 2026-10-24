@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
-import { ArrowDown, Hand, Layers3, Pause, Play, RotateCcw } from 'lucide-react';
+import { ArrowDown, Layers3, RotateCcw } from 'lucide-react';
 import './project-showcase.css';
 
 const WalkwayScene = dynamic(() => import('./walkway-scene'), {
@@ -22,11 +22,10 @@ export default function ProjectShowcase() {
   const [phase, setPhase] = useState(0);
   const [manual, setManual] = useState(false);
   const [reduced, setReduced] = useState(false);
-  const [active, setActive] = useState(false);
   const [entered, setEntered] = useState(false);
   const [exploded, setExploded] = useState(false);
-  const [rotating, setRotating] = useState(false);
-  const [interactive, setInteractive] = useState(false);
+  const rotating = true;
+  const interactive = true;
   const [resetKey, setResetKey] = useState(0);
 
   useEffect(() => {
@@ -35,13 +34,11 @@ export default function ProjectShowcase() {
     const updatePreference = () => {
       setReduced(motion.matches);
       setManual(motion.matches || shortScreen.matches);
-      if (motion.matches) setRotating(false);
     };
     updatePreference();
     motion.addEventListener('change', updatePreference);
     shortScreen.addEventListener('change', updatePreference);
     const observer = new IntersectionObserver(([entry]) => {
-      setActive(entry.isIntersecting);
       if (entry.isIntersecting) setEntered(true);
     }, { rootMargin: '150px' });
     if (section.current) observer.observe(section.current);
@@ -89,12 +86,13 @@ export default function ProjectShowcase() {
       <div className="project-story-layout">
         <div className="project-story-copy"><span className="eyebrow">0{phase + 1} / 03 · {chapters[phase].label.toUpperCase()}</span><h3>{chapters[phase].title}</h3><p>{chapters[phase].body}</p><div className="project-source"><img src={`${base}/images/projects/project-03.jpg`} alt="Original KDX archive image of the steel walkway and stairs used for this visual reconstruction" loading="lazy"/><span>FROM OUR PROJECT ARCHIVE<small>ORIGINAL STEEL MODEL / 03</small></span></div></div>
         <div className="walkway-visual">
-          <div className="walkway-canvas" data-interactive={interactive} aria-label="Interactive walkway model">{entered && <WalkwayScene phase={phase} exploded={exploded} rotating={rotating} resetKey={resetKey} active={active} reduced={reduced} interactive={interactive}/>}</div>
-          <div className="walkway-controls"><div><button onClick={() => setExploded(!exploded)} aria-pressed={exploded}><Layers3 size={15}/>{exploded ? 'Assemble layers' : 'Separate layers'}</button><button onClick={() => setInteractive(!interactive)} aria-pressed={interactive}><Hand size={15}/>{interactive ? 'Finish exploring' : 'Drag to explore'}</button></div><div><button onClick={() => setRotating(!rotating)} aria-label={rotating ? 'Pause walkway rotation' : 'Rotate walkway'} aria-pressed={rotating}>{rotating ? <Pause size={16}/> : <Play size={16}/>}</button><button onClick={() => {setResetKey(key => key + 1); setExploded(false); setRotating(false); setInteractive(false);}} aria-label="Reset walkway view"><RotateCcw size={16}/></button></div></div>
-          <span className="walkway-hint">{interactive ? 'DRAG THE MODEL TO ROTATE' : 'SCROLL TO REVEAL · SELECT A STAGE TO JUMP AHEAD'}</span>
+          <div className="walkway-canvas" data-interactive={interactive} aria-label="Interactive walkway model">{entered && <WalkwayScene phase={phase} exploded={exploded} rotating={rotating} resetKey={resetKey} reduced={reduced} interactive={interactive}/>}</div>
+          <div className="walkway-controls"><div><button onClick={() => setExploded(!exploded)} aria-pressed={exploded}><Layers3 size={15}/>{exploded ? 'Assemble layers' : 'Separate layers'}</button></div><div><button onClick={() => {setResetKey(key => key + 1); setExploded(false);}} aria-label="Reset walkway view"><RotateCcw size={16}/></button></div></div>
+          <span className="walkway-hint">AUTO-ROTATING · DRAG TO INSPECT · SCROLL TO REVEAL EACH STAGE</span>
         </div>
       </div>
       <div className="project-story-bottom"><div className="walkway-stages" role="group" aria-label="Walkway design stages">{chapters.map((chapter,index) => <button key={chapter.label} onClick={() => choosePhase(index)} aria-pressed={phase === index}><small>0{index+1}</small>{chapter.label}<i/></button>)}</div><div className="project-story-progress"><div ref={progressBar}/></div><div className="walkway-footnote"><span>{manual ? 'SELECT A STAGE TO EXPLORE' : 'SCROLL TO SEE THE DESIGN TAKE SHAPE'}</span><p>Visual reconstruction from an archive image. Architectural finishes are an illustrative design exploration.</p></div></div>
     </div>
   </section>;
 }
+

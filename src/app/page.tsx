@@ -41,7 +41,7 @@ function Logo() { return <a className="brand" href="#top" aria-label="KDX Drafti
 export default function Home() {
   const [menu, setMenu] = useState(false);
   const [discipline, setDiscipline] = useState<Discipline>('steel');
-  const [openDetail, setOpenDetail] = useState<number | null>(0);
+  const [openDetail, setOpenDetail] = useState<number | null>(null);
   const [filter, setFilter] = useState('All projects');
   const [expanded, setExpanded] = useState(false);
   const [selected, setSelected] = useState<PortfolioProject | null>(null);
@@ -49,6 +49,8 @@ export default function Home() {
   const [enquiryService, setEnquiryService] = useState('');
   const dialog = useRef<HTMLDialogElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
+  const projectTitle = useRef<HTMLDivElement>(null);
+  const expertiseTitle = useRef<HTMLDivElement>(null);
   const service = disciplines[discipline];
   const filtered = portfolio.filter(p => filter === 'All projects' || p.category === filter);
   const visible = expanded ? filtered : filtered.slice(0, 3);
@@ -60,6 +62,56 @@ export default function Home() {
     return () => window.removeEventListener('keydown', close);
   }, [menu]);
   useEffect(() => {
+    const title = projectTitle.current;
+    if (!title) return;
+    if (!('IntersectionObserver' in window)) {
+      title.classList.add('is-visible');
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      title.classList.toggle('is-visible', entry.isIntersecting);
+    }, { threshold: 0.35 });
+    observer.observe(title);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    const title = expertiseTitle.current;
+    if (!title) return;
+    if (!('IntersectionObserver' in window)) {
+      title.classList.add('is-visible');
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      title.classList.toggle('is-visible', entry.isIntersecting);
+    }, { threshold: 0.35 });
+    observer.observe(title);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    const targets = document.querySelectorAll<HTMLElement>([
+      '#services > .section-label', '#services > .section-heading', '#services > .discipline-tabs', '#services > .service-panel',
+      '#projects > .section-label', '#projects > .section-heading', '#projects > .project-filter-row', '#projects > .project-grid', '#projects > .portfolio-bottom',
+      '#approach .detail-intro > .section-label', '#approach .detail-intro > .section-heading', '#approach .detail-study-tabs',
+      '#about > .section-label', '#about > .studio-grid', '#about > .process-strip',
+      '#contact > .contact-copy', '#contact > .contact-form',
+    ].join(','));
+    if (!targets.length) return;
+    targets.forEach((target, index) => {
+      target.classList.add('scroll-section-item');
+      target.style.setProperty('--scroll-item-delay', `${(index % 3) * 90}ms`);
+      target.style.setProperty('--scroll-enter-x', index % 2 ? '32px' : '-32px');
+    });
+    if (!('IntersectionObserver' in window)) {
+      targets.forEach(target => target.classList.add('is-in-view'));
+      return;
+    }
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => entry.target.classList.toggle('is-in-view', entry.isIntersecting));
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    targets.forEach(target => observer.observe(target));
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
     const el = dialog.current;
     if (selected && el && !el.open) el.showModal();
     if (!selected && el?.open) el.close();
@@ -68,7 +120,7 @@ export default function Home() {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = previous; };
   }, [selected]);
-  function chooseService(next: Discipline) { setDiscipline(next); setOpenDetail(0); }
+  function chooseService(next: Discipline) { setDiscipline(next); setOpenDetail(null); }
   function submitEnquiry(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -92,21 +144,21 @@ export default function Home() {
 
       <section className="expertise section-wrap" id="services">
         <div className="section-label"><span>01 / OUR EXPERTISE</span><span>TWO SPECIALIST SERVICES</span></div>
-        <div className="section-heading"><h2>Two disciplines.<br/><span>One eye for detail.</span></h2><p>Choose the expertise your project needs.<br/>The same care and clarity, whichever way you build.</p></div>
+        <div className="section-heading title-reveal" ref={expertiseTitle}><h2 className="word-reveal" aria-label="Two disciplines. One eye for detail."><span className="reveal-word" aria-hidden="true">Two</span>{' '}<span className="reveal-word" aria-hidden="true">disciplines.</span><br/><span className="reveal-word accent-word" aria-hidden="true">One</span>{' '}<span className="reveal-word accent-word" aria-hidden="true">eye</span>{' '}<span className="reveal-word accent-word" aria-hidden="true">for</span>{' '}<span className="reveal-word accent-word" aria-hidden="true">detail.</span></h2><p>Choose the expertise your project needs.<br/>The same care and clarity, whichever way you build.</p></div>
         <div className="discipline-tabs" role="group" aria-label="Choose a service">
           <button onClick={() => chooseService('steel')} aria-pressed={discipline === 'steel'}><small>01</small><span>Steel detailing</span><ArrowUpRight/></button>
           <button onClick={() => chooseService('architecture')} aria-pressed={discipline === 'architecture'}><small>02</small><span>Architectural drafting</span><ArrowUpRight/></button>
         </div>
         <div className={`service-panel service-${discipline}`}>
-          <figure className="service-art"><div className="art-top"><span>{service.kicker}</span><Plus size={18}/></div><img key={discipline} src={`${base}${service.image}`} alt={service.alt} loading="lazy"/><figcaption>{service.caption}</figcaption><div className="service-tags">{service.tags.map(tag => <span key={tag}>{tag}</span>)}</div></figure>
-          <div className="service-content"><h3>{service.intro}</h3><p>{service.body}</p><div className="service-list">{service.services.map(([title,body],i) => <article key={`${discipline}-${title}`}><button onClick={() => setOpenDetail(openDetail === i ? null : i)} aria-expanded={openDetail === i} aria-controls={`service-detail-${i}`}><span>{title}</span>{openDetail === i ? <Minus size={17}/> : <Plus size={17}/>}</button><div id={`service-detail-${i}`} hidden={openDetail !== i}><p>{body}</p></div></article>)}</div><a href="#contact" className="text-link" onClick={() => setEnquiryService(service.title)}>Discuss your {discipline === 'steel' ? 'steel' : 'architectural'} project <ArrowUpRight size={17}/></a></div>
+          <figure className="service-art"><div className="art-top"><span>{service.kicker}</span><span className="elevation-tag">ELEVATION / {discipline === 'steel' ? '01' : '02'}</span></div><img key={discipline} src={`${base}${service.image}`} alt={service.alt} loading="lazy"/><figcaption>{service.caption}</figcaption><div className="service-tags">{service.tags.map(tag => <span key={tag}>{tag}</span>)}</div></figure>
+          <div className="service-content"><h3>{service.intro}</h3><p>{service.body}</p><div className="service-list">{service.services.map(([title,body],i) => <article key={`${discipline}-${title}`} onMouseEnter={() => setOpenDetail(i)} onMouseLeave={() => setOpenDetail(null)}><button aria-expanded={openDetail === i} aria-controls={`service-detail-${i}`}><span>{title}</span>{openDetail === i ? <Minus size={17}/> : <Plus size={17}/>}</button><div id={`service-detail-${i}`}><p>{body}</p></div></article>)}</div><a href="#contact" className="text-link" onClick={() => setEnquiryService(service.title)}>Discuss your {discipline === 'steel' ? 'steel' : 'architectural'} project <ArrowUpRight size={17}/></a></div>
         </div>
       </section>
 
       <section className="project-section section-wrap" id="projects">
         <div className="section-label"><span>02 / SELECTED WORK</span><span>REAL PROJECTS. RESOLVED IN DETAIL.</span></div>
-        <div className="section-heading"><h2>Small homes.<br/>Big possibilities.</h2><p>Residential frames, sheds and industrial structures. A closer look at the steel detailing behind our clients’ projects.</p></div>
-        <div className="project-filter-row"><div className="project-filters" role="group" aria-label="Filter completed projects">{['All projects','Residential','Sheds & commercial','Industrial'].map(label => <button key={label} aria-pressed={filter === label} onClick={() => {setFilter(label); setExpanded(false);}}>{label}{label === 'All projects' && <small>10</small>}</button>)}</div><span className="project-count" aria-live="polite">{String(filtered.length).padStart(2,'0')} PROJECTS</span></div>
+        <div className="section-heading title-reveal" ref={projectTitle}><h2 className="word-reveal" aria-label="Small homes. Big possibilities."><span className="reveal-word" aria-hidden="true">Small</span>{' '}<span className="reveal-word" aria-hidden="true">homes.</span><br/><span className="reveal-word" aria-hidden="true">Big</span>{' '}<span className="reveal-word" aria-hidden="true">possibilities.</span></h2><p>Residential frames, sheds and industrial structures. A closer look at the steel detailing behind our clients’ projects.</p></div>
+        <div className="project-filter-row"><div className="project-filters" role="group" aria-label="Filter completed projects">{['All projects','Residential','Sheds & commercial','Industrial'].map((label,i) => <button key={label} data-index={`0${i+1}`} aria-pressed={filter === label} onClick={() => {setFilter(label); setExpanded(false);}}>{label}{label === 'All projects' && <small>10</small>}</button>)}</div><span className="project-count" aria-live="polite">{String(filtered.length).padStart(2,'0')} PROJECTS</span></div>
         <div className="project-grid">{visible.map((project,i) => <button className="project-card" key={project.id} onClick={() => setSelected(project)} aria-label={`View ${project.name} project`}><div className="project-image"><span className="project-id">{project.id}</span><img src={`${base}/images/projects/${project.image}.jpg`} alt={`${project.name} — original KDX steel model`} loading="lazy"/><span className="project-open"><MoveUpRight size={23}/></span></div><div className="project-caption"><div><small>{project.category} / {project.location}</small><h3>{project.name}</h3></div><span>{String(i+1).padStart(2,'0')}</span></div></button>)}</div>
         <div className="portfolio-bottom"><p>Images from our original project models.</p>{filtered.length > 3 && <button className="text-link" onClick={() => setExpanded(!expanded)}>{expanded ? 'Show selected projects' : `Explore all ${filtered.length} projects`}{expanded ? <Minus size={17}/> : <Plus size={17}/>}</button>}</div>
       </section>
@@ -121,3 +173,4 @@ export default function Home() {
     <dialog ref={dialog} className="project-dialog" aria-labelledby="project-dialog-title" onCancel={() => setSelected(null)} onClose={() => setSelected(null)} onClick={e => {if(e.target === e.currentTarget) setSelected(null);}}>{selected && <div className="dialog-inner"><div className="dialog-top"><span>{selected.id} / {selected.category}</span><button autoFocus onClick={() => setSelected(null)} aria-label="Close project"><X size={22}/></button></div><img src={`${base}/images/projects/${selected.image}.jpg`} alt={`${selected.name} — original project model, enlarged`}/><div className="dialog-copy"><span className="eyebrow">{selected.location}</span><h2 id="project-dialog-title">{selected.name}</h2><p>{selected.detail}</p><small>Original KDX steel model · Completed project archive</small><a href="#contact" className="text-link" onClick={() => {setSelected(null);setEnquiryService('Steel detailing');}}>Have a similar project? <ArrowUpRight size={17}/></a></div></div>}</dialog>
   </>;
 }
+

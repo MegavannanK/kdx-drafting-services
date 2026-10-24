@@ -1,7 +1,7 @@
 'use client';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Environment, Lightformer } from '@react-three/drei';
+import { Environment, Lightformer, OrbitControls } from '@react-three/drei';
 import { Component, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import * as THREE from 'three';
 
@@ -43,7 +43,7 @@ function Plant({ at, scale = 1, tree = false }: { at: Point; scale?: number; tre
     {tree && <><mesh position={[0,1.2,0]} castShadow><cylinderGeometry args={[.055,.10,2.4,7]}/><meshStandardMaterial color="#7f7159" roughness={1}/></mesh><mesh position={[.14,1.9,.04]} rotation={[0,0,-.45]} castShadow><cylinderGeometry args={[.035,.05,1.1,6]}/><meshStandardMaterial color="#7f7159"/></mesh></>}
     {Array.from({length:tree?38:7},(_,i) => {
       const angle=i*2.4, radius=tree?.65:.20;
-      return <mesh key={i} position={[Math.sin(angle)*radius,(tree?2.25:.25)+Math.sin(i*1.4)*(tree?.58:.09),Math.cos(angle)*radius]} scale={tree?[1,.65,.9]:[.65,1,.65]} castShadow><icosahedronGeometry args={[tree?.37:.22,1]}/><meshStandardMaterial color={['#667058','#52644a','#7f8969'][i%3]} roughness={1}/></mesh>;
+      return <mesh key={i} position={[Math.sin(angle)*radius,(tree?2.25:.25)+Math.sin(i*1.4)*(tree?.58:.09),Math.cos(angle)*radius]} scale={tree?[1,.65,.9]:[.65,1,.65]}><icosahedronGeometry args={[tree?.37:.22,1]}/><meshStandardMaterial color={['#667058','#52644a','#7f8969'][i%3]} roughness={1}/></mesh>;
     })}
   </group>;
 }
@@ -142,30 +142,31 @@ function Film(props: Props) {
   const firstFrame = useRef(true);
   const completed = useRef(false);
   useEffect(() => { invalidate(); completed.current=false; }, [props.revision,props.running,invalidate]);
+  useEffect(() => {
+    if (camera instanceof THREE.OrthographicCamera) {
+      const compact = size.width < 600;
+      camera.zoom = Math.min(size.width / (compact ? 20 : 21), size.height / 16.5);
+      camera.updateProjectionMatrix();
+    }
+  }, [camera, size.width, size.height]);
   useFrame((_, delta) => {
     if (props.running && !completed.current) props.clock.current = Math.min(DURATION,props.clock.current + Math.min(delta,.05));
     const time = props.clock.current;
     const nextChapter = time < 5 ? 0 : time < 12 ? 1 : time < 21 ? 2 : 3;
     if (nextChapter !== chapter.current) {chapter.current=nextChapter;props.onChapter(nextChapter);}
     if (props.progress.current) props.progress.current.style.transform=`scaleX(${time/DURATION})`;
-    const compact=size.width<600;
-    const movement=props.reduced?1:time/DURATION;
-    const angle=.85-movement*.32;
-    const elevation=20-movement*4;
-    camera.position.set(Math.sin(angle)*24,elevation,Math.cos(angle)*24);
-    camera.lookAt(0,1.05,.2);
-    if(camera instanceof THREE.OrthographicCamera){camera.zoom=Math.min(size.width/(compact?20:21),size.height/16.5);camera.updateProjectionMatrix();}
     if(firstFrame.current){firstFrame.current=false;props.onReady();}
     if(time>=DURATION && props.running && !completed.current){completed.current=true;props.onComplete();}
   });
   return <>
     <color attach="background" args={['#e9e6dc']}/>
     <ambientLight intensity={.35}/><hemisphereLight args={['#f7f3e6','#929587',.8]}/>
-    <directionalLight position={[-8,14,6]} intensity={2.5} color="#fff0d3" castShadow shadow-mapSize={[2048,2048]} shadow-camera-left={-16} shadow-camera-right={16} shadow-camera-top={16} shadow-camera-bottom={-16} shadow-bias={-.0005} shadow-normalBias={.035}/>
+    <directionalLight position={[-8,14,6]} intensity={2.5} color="#fff0d3" castShadow shadow-mapSize={[1024,1024]} shadow-camera-left={-16} shadow-camera-right={16} shadow-camera-top={16} shadow-camera-bottom={-16} shadow-bias={-.0005} shadow-normalBias={.035}/>
     <directionalLight position={[8,7,-6]} intensity={.65} color="#c8e0ed"/>
     <Environment frames={1} resolution={128}><Lightformer intensity={2} color="#fff6e5" position={[0,10,0]} rotation={[Math.PI/2,0,0]} scale={[15,15,1]}/><Lightformer intensity={1} color="#c8dce4" position={[10,3,0]} rotation={[0,-Math.PI/2,0]} scale={[10,6,1]}/></Environment>
     <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.11,0]} receiveShadow><planeGeometry args={[200,200]}/><shadowMaterial color="#606554" transparent opacity={.19}/></mesh>
     <House clock={props.clock}/>
+    <OrbitControls makeDefault target={[0,1.05,.2]} enablePan={false} enableZoom={false} enableRotate minAzimuthAngle={-Math.PI} maxAzimuthAngle={Math.PI} minPolarAngle={Math.PI/8} maxPolarAngle={Math.PI/2.05}/>
   </>;
 }
 class FilmBoundary extends Component<{children:ReactNode;onFailure:()=>void},{failed:boolean}> {
@@ -184,5 +185,6 @@ export default function ConstructionScene(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[]);
   if(!supported)return null;
-  return <FilmBoundary onFailure={props.onFailure}><Canvas orthographic shadows dpr={[1,1.5]} camera={{position:[15,20,20],zoom:35,near:.1,far:300}} gl={{alpha:false,antialias:true,powerPreference:'high-performance'}} frameloop={props.running?'always':'demand'} onCreated={({gl})=>{gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1;}}><Film {...props}/></Canvas></FilmBoundary>;
+  return <FilmBoundary onFailure={props.onFailure}><Canvas orthographic shadows dpr={[1,1.25]} camera={{position:[15,20,20],zoom:35,near:.1,far:300}} gl={{alpha:false,antialias:true,powerPreference:'high-performance'}} frameloop={props.running?'always':'demand'} onCreated={({gl})=>{gl.toneMapping=THREE.ACESFilmicToneMapping;gl.toneMappingExposure=1;}}><Film {...props}/></Canvas></FilmBoundary>;
 }
+
