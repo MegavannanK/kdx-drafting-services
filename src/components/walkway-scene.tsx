@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { Beam } from './steel-scene';
 
 type Point = [number, number, number];
-type Props = { phase: number; exploded: boolean; rotating: boolean; resetKey: number; active: boolean };
+type Props = { phase: number; exploded: boolean; rotating: boolean; resetKey: number; active: boolean; reduced: boolean; interactive: boolean };
 function Block({at,size,color,glass=false}:{at:Point;size:Point;color:string;glass?:boolean}) {
   return <mesh position={at} castShadow={!glass} receiveShadow><boxGeometry args={size}/><meshStandardMaterial color={color} transparent={glass} opacity={glass?.38:1} depthWrite={!glass} roughness={glass?.15:.65} metalness={glass?.25:.1}/></mesh>;
 }
@@ -20,13 +20,13 @@ function Stair({side,finish}:{side:number;finish:boolean}) {
     <Block at={[bottom,.08,0]} size={[2,.18,2.9]} color="#a6acaa"/>
   </group>;
 }
-function Walkway({phase,exploded}:Pick<Props,'phase'|'exploded'>) {
+function Walkway({phase,exploded,reduced}:Pick<Props,'phase'|'exploded'|'reduced'>) {
   const frame=useRef<THREE.Group>(null),finish=useRef<THREE.Group>(null),deck=useRef<THREE.Group>(null);
   const state=useRef({frame:phase>=1?1:0,finish:phase>=2?1:0,explode:0});
   useFrame((_,delta)=>{
-    state.current.frame=THREE.MathUtils.damp(state.current.frame,phase>=1?1:0,5,delta);
-    state.current.finish=THREE.MathUtils.damp(state.current.finish,phase>=2?1:0,5,delta);
-    state.current.explode=THREE.MathUtils.damp(state.current.explode,exploded?1:0,5,delta);
+    state.current.frame=reduced?(phase>=1?1:0):THREE.MathUtils.damp(state.current.frame,phase>=1?1:0,5,delta);
+    state.current.finish=reduced?(phase>=2?1:0):THREE.MathUtils.damp(state.current.finish,phase>=2?1:0,5,delta);
+    state.current.explode=reduced?(exploded?1:0):THREE.MathUtils.damp(state.current.explode,exploded?1:0,5,delta);
     if(frame.current){frame.current.scale.y=Math.max(.001,state.current.frame);frame.current.visible=state.current.frame>.005;frame.current.position.y=(1-state.current.frame)*3;}
     if(deck.current)deck.current.position.y=state.current.explode*.7;
     if(finish.current){finish.current.scale.y=Math.max(.001,state.current.finish);finish.current.position.y=(1-state.current.finish)*3+state.current.explode*2;finish.current.visible=state.current.finish>.005;}
@@ -54,7 +54,21 @@ function Walkway({phase,exploded}:Pick<Props,'phase'|'exploded'>) {
     </group>
   </group>;
 }
-function Camera({resetKey,exploded}:Pick<Props,'resetKey'|'exploded'>){const {camera,size}=useThree();useEffect(()=>{camera.position.set(16,11,19);camera.lookAt(0,1,0);},[camera,resetKey]);useEffect(()=>{if(camera instanceof THREE.OrthographicCamera){camera.zoom=Math.min(size.width/32,size.height/13,38)*(exploded?.85:1);camera.updateProjectionMatrix();}},[camera,size.width,size.height,exploded,resetKey]);return null;}
+function Camera({resetKey,exploded}:Pick<Props,'resetKey'|'exploded'>) {
+  const {camera,size}=useThree();
+  const compact=size.width<500;
+  useEffect(()=>{
+    camera.position.set(...(compact?[24,18,14]:[16,11,19]) as Point);
+    camera.lookAt(0,1,0);
+  },[camera,resetKey,compact]);
+  useEffect(()=>{
+    if(camera instanceof THREE.OrthographicCamera){
+      camera.zoom=Math.min(size.width/(compact?23:32),size.height/(compact?16:13),38)*(exploded?.85:1);
+      camera.updateProjectionMatrix();
+    }
+  },[camera,size.width,size.height,exploded,resetKey,compact]);
+  return null;
+}
 function Fallback(){return <div className="walkway-fallback"><img src={`${process.env.NEXT_PUBLIC_BASE_PATH||''}/images/projects/project-03.jpg`} alt="Original KDX covered walkway steel model"/><p>Original project image · Interactive 3D is unavailable on this device.</p></div>;}
 class Boundary extends Component<{children:ReactNode},{failed:boolean}>{state={failed:false};static getDerivedStateFromError(){return{failed:true};}render(){return this.state.failed?<Fallback/>:this.props.children;}}
-export default function WalkwayScene(props:Props){const[available,setAvailable]=useState<boolean|null>(null);useEffect(()=>{const c=document.createElement('canvas').getContext('webgl2');setAvailable(Boolean(c));c?.getExtension('WEBGL_lose_context')?.loseContext();},[]);if(available===false)return <Fallback/>;if(available===null)return <div className="scene-loading">Preparing the project study…</div>;return <Boundary><Canvas orthographic shadows dpr={[1,1.5]} camera={{position:[16,11,19],zoom:26,near:.1,far:150}} frameloop={props.active?'always':'never'} gl={{alpha:true,antialias:true}}><Camera resetKey={props.resetKey} exploded={props.exploded}/><ambientLight intensity={1.8}/><directionalLight position={[4,12,8]} intensity={3} castShadow shadow-mapSize={[1024,1024]}/><directionalLight position={[-6,4,-3]} intensity={1.8} color="#93c9e7"/><Walkway phase={props.phase} exploded={props.exploded}/><ContactShadows position={[0,-1.94,0]} color="#07101a" opacity={.5} scale={40} blur={2} far={12}/><OrbitControls key={props.resetKey} makeDefault target={[0,props.exploded?1.6:.8,0]} enablePan={false} minZoom={10} maxZoom={65} autoRotate={props.rotating} autoRotateSpeed={.22} minPolarAngle={Math.PI/7} maxPolarAngle={Math.PI/2.1}/></Canvas></Boundary>;}
+export default function WalkwayScene(props:Props){const[available,setAvailable]=useState<boolean|null>(null);useEffect(()=>{const c=document.createElement('canvas').getContext('webgl2');setAvailable(Boolean(c));c?.getExtension('WEBGL_lose_context')?.loseContext();},[]);if(available===false)return <Fallback/>;if(available===null)return <div className="scene-loading">Preparing the project study…</div>;return <Boundary><Canvas orthographic shadows dpr={[1,1.5]} camera={{position:[16,11,19],zoom:26,near:.1,far:150}} frameloop={props.active?'always':'never'} gl={{alpha:true,antialias:true}}><Camera resetKey={props.resetKey} exploded={props.exploded}/><ambientLight intensity={1.8}/><directionalLight position={[4,12,8]} intensity={3} castShadow shadow-mapSize={[1024,1024]}/><directionalLight position={[-6,4,-3]} intensity={1.8} color="#93c9e7"/><Walkway phase={props.phase} exploded={props.exploded} reduced={props.reduced}/><ContactShadows position={[0,-1.94,0]} color="#07101a" opacity={.5} scale={40} blur={2} far={12}/><OrbitControls key={props.resetKey} makeDefault target={[0,props.exploded?1.6:.8,0]} enablePan={false} enableZoom={false} enableRotate={props.interactive} minZoom={10} maxZoom={65} autoRotate={props.rotating} autoRotateSpeed={.22} minPolarAngle={Math.PI/7} maxPolarAngle={Math.PI/2.1}/></Canvas></Boundary>;}

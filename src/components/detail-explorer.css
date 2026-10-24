@@ -1,0 +1,11 @@
+.detail-intro{background:#fffefa;padding-bottom:35px}
+.detail-intro .section-heading{margin-bottom:35px}
+.detail-study-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid var(--line)}
+.detail-study-tabs button{display:flex;justify-content:space-between;align-items:center;gap:20px;text-align:left;background:#f0f0ea;padding:22px 25px;font-size:20px;letter-spacing:-.5px;transition:background .2s,color .2s}
+.detail-study-tabs button+button{border-left:1px solid var(--line)}
+.detail-study-tabs button small{display:block;font:8px var(--mono);letter-spacing:.8px;margin-bottom:9px;color:#657d8a}
+.detail-study-tabs button[aria-pressed=true]{background:#223e50;color:white}
+.detail-study-tabs button[aria-pressed=true] small{color:#aac8d9}
+.detail-study-tabs button:hover{background:#dce7eb;color:#253741}
+.detail-study-tabs button[aria-pressed=true]:hover{background:#2e5064;color:white}
+@media(max-width:560px){.detail-intro{padding-bottom:25px}.detail-study-tabs button{font-size:16px;padding:17px 12px;gap:8px;line-height:1.25}.detail-study-tabs button small{font-size:6px}.detail-study-tabs button>svg{width:15px}}

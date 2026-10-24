@@ -1,35 +1,100 @@
 'use client';
+
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
-import { ArrowDown, ArrowLeft, ArrowRight, Layers3, Pause, Play, RotateCcw } from 'lucide-react';
+import { ArrowDown, Hand, Layers3, Pause, Play, RotateCcw } from 'lucide-react';
 import './project-showcase.css';
-const WalkwayScene=dynamic(()=>import('./walkway-scene'),{ssr:false,loading:()=> <div className="scene-loading">Preparing the project study…</div>});
-const basePath=process.env.NEXT_PUBLIC_BASE_PATH||'';
-const studies=[
-  {name:'Layers of a building',detail:'Primary framing, floor systems and connections.'},
-  {name:'A frame in balance',detail:'Columns, beams and foundation coordination.'},
-  {name:'Connecting places',detail:'A covered walkway with raised decking and stairs.'},
-  {name:'A change in direction',detail:'Walkway framing, balustrades and supporting columns.'},
-  {name:'The roofscape',detail:'Roof members coordinated across a complex footprint.'},
-  {name:'The rhythm of a structure',detail:'Floor joists and primary member coordination.'},
-  {name:'Strength in the detail',detail:'A cantilevered platform and its supporting connections.'},
+
+const WalkwayScene = dynamic(() => import('./walkway-scene'), {
+  ssr: false,
+  loading: () => <div className="scene-loading">Preparing the walkway study…</div>,
+});
+const base = process.env.NEXT_PUBLIC_BASE_PATH || '';
+const chapters = [
+  { label: 'Structure', title: <>A strong start.<br/><span>Every step supported.</span></>, body: 'Columns, footings and bracing establish the rhythm of an elevated walkway.' },
+  { label: 'Connect', title: <>From one place.<br/><span>To the next.</span></>, body: 'Stairs, landings and balustrades join the frame into a continuous route. Scroll to see each layer come together.' },
+  { label: 'Experience', title: <>The frame becomes<br/><span>an everyday place.</span></>, body: 'A canopy, warm decking and glazed screens explore a possible architectural finish for the steel structure.' },
 ];
-const chapters=[
-  {label:'Structure',title:<>Start with<br/><em>solid foundations.</em></>,body:'Follow the column rhythm and bracing that support the elevated walkway.'},
-  {label:'Connect',title:<>A structure becomes<br/><em>a place to move.</em></>,body:'Decking, stairs and balustrades connect the two landings into one continuous route.'},
-  {label:'Experience',title:<>The complete<br/><em>architectural experience.</em></>,body:'A canopy, timber-toned deck and glazed wind screens explore how the steel structure could become a finished space.'},
-];
-export default function ProjectShowcase(){
-  const section=useRef<HTMLElement>(null),bar=useRef<HTMLDivElement>(null);
-  const [phase,setPhase]=useState(0),[reduced,setReduced]=useState(false),[active,setActive]=useState(false),[entered,setEntered]=useState(false);
-  const [exploded,setExploded]=useState(false),[rotating,setRotating]=useState(false),[resetKey,setResetKey]=useState(0),[study,setStudy]=useState(2);
-  useEffect(()=>{const mq=matchMedia('(prefers-reduced-motion: reduce)');const change=()=>{setReduced(mq.matches);if(mq.matches)setRotating(false);};change();mq.addEventListener('change',change);const observer=new IntersectionObserver(([e])=>{setActive(e.isIntersecting);if(e.isIntersecting)setEntered(true);},{rootMargin:'150px'});if(section.current)observer.observe(section.current);return()=>{mq.removeEventListener('change',change);observer.disconnect();};},[]);
-  useEffect(()=>{if(reduced)return;let raf=0;const update=()=>{raf=0;const el=section.current;if(!el)return;const p=Math.max(0,Math.min(1,-el.getBoundingClientRect().top/Math.max(1,el.offsetHeight-window.innerHeight)));setPhase(Math.min(2,Math.floor(p*3)));if(bar.current)bar.current.style.transform=`scaleX(${p})`;};const scroll=()=>{if(!raf)raf=requestAnimationFrame(update);};update();window.addEventListener('scroll',scroll,{passive:true});window.addEventListener('resize',scroll);return()=>{window.removeEventListener('scroll',scroll);window.removeEventListener('resize',scroll);cancelAnimationFrame(raf);};},[reduced]);
-  function choosePhase(i:number){if(reduced){setPhase(i);return;}const el=section.current;if(el)window.scrollTo({top:window.scrollY+el.getBoundingClientRect().top+(el.offsetHeight-window.innerHeight)*(i/3+.1),behavior:'smooth'});}
-  return <>
-    <section ref={section} className="project-story" data-reduced-motion={reduced} aria-label="Covered walkway project reconstruction">
-      <div className="project-story-sticky"><div className="project-story-top"><span>FEATURED STUDY / COVERED WALKWAY</span><a href="#work-gallery">Browse the gallery <ArrowDown size={13}/></a></div><div className="project-story-layout"><div className="project-story-copy"><span className="eyebrow">0{phase+1} / 03 · {chapters[phase].label.toUpperCase()}</span><h3>{chapters[phase].title}</h3><p>{chapters[phase].body}</p><div className="project-source"><img src={`${basePath}/images/projects/project-03.jpg`} alt="Original KDX covered walkway project image used as the reconstruction reference" loading="lazy"/><span>THE ORIGINAL STEEL STUDY<small>KDX PROJECT ARCHIVE / 03</small></span></div></div><div className="walkway-visual" aria-label="Interactive covered walkway reconstruction">{entered&&<WalkwayScene phase={phase} exploded={exploded} rotating={rotating} resetKey={resetKey} active={active}/>}<div className="walkway-controls"><button onClick={()=>setExploded(!exploded)} aria-pressed={exploded}><Layers3 size={14}/>{exploded?'Assemble walkway':'Separate layers'}</button><div><button onClick={()=>setRotating(!rotating)} aria-label={rotating?'Pause walkway rotation':'Rotate walkway'}>{rotating?<Pause size={14}/>:<Play size={14}/>}</button><button onClick={()=>{setResetKey(x=>x+1);setExploded(false);}} aria-label="Reset walkway view"><RotateCcw size={14}/></button></div></div><span className="walkway-hint">DRAG TO EXPLORE · SCROLL TO ZOOM</span></div></div><div className="project-story-bottom"><span>{reduced?'SELECT A STAGE':'SCROLL TO SEE THE DESIGN TAKE SHAPE'}</span><div role="group" aria-label="Walkway design stages">{chapters.map((c,i)=><button key={c.label} onClick={()=>choosePhase(i)} aria-pressed={phase===i} className={phase===i?'active':''}><small>0{i+1}</small>{c.label}</button>)}</div><p>VISUAL RECONSTRUCTION FROM ARCHIVE IMAGE · ARCHITECTURAL FINISHES ARE A DESIGN EXPLORATION</p><div className="project-story-progress"><div ref={bar}/></div></div></div>
-    </section>
-    <div className="work-gallery" id="work-gallery"><div className="gallery-heading"><div><span className="eyebrow">FROM OUR PROJECT ARCHIVE</span><h3>The work.<br/><em>In its own detail.</em></h3></div><p>Seven original KDX model studies.<br/>Choose a view to discover the work up close.</p></div><figure className="gallery-stage"><img key={study} src={`${basePath}/images/projects/project-0${study+1}.jpg`} alt={`Original KDX project study ${study+1}: ${studies[study].name}`}/><figcaption><div><span>STUDY 0{study+1} / 07</span><h4>{studies[study].name}</h4><p>{studies[study].detail}</p></div><div className="gallery-arrows"><button aria-label="Previous project study" onClick={()=>setStudy((study+6)%7)}><ArrowLeft size={18}/></button><button aria-label="Next project study" onClick={()=>setStudy((study+1)%7)}><ArrowRight size={18}/></button></div></figcaption></figure><div className="gallery-thumbnails" role="group" aria-label="Choose a project study">{studies.map((s,i)=><button key={s.name} aria-label={`View study ${i+1}: ${s.name}`} aria-pressed={study===i} className={study===i?'active':''} onClick={()=>setStudy(i)}><img src={`${basePath}/images/projects/project-0${i+1}.jpg`} alt="" loading="lazy"/><span>0{i+1}</span></button>)}</div></div>
-  </>;
+
+export default function ProjectShowcase() {
+  const section = useRef<HTMLElement>(null);
+  const progressBar = useRef<HTMLDivElement>(null);
+  const [phase, setPhase] = useState(0);
+  const [manual, setManual] = useState(false);
+  const [reduced, setReduced] = useState(false);
+  const [active, setActive] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const [exploded, setExploded] = useState(false);
+  const [rotating, setRotating] = useState(false);
+  const [interactive, setInteractive] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
+
+  useEffect(() => {
+    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    const shortScreen = matchMedia('(max-height: 600px)');
+    const updatePreference = () => {
+      setReduced(motion.matches);
+      setManual(motion.matches || shortScreen.matches);
+      if (motion.matches) setRotating(false);
+    };
+    updatePreference();
+    motion.addEventListener('change', updatePreference);
+    shortScreen.addEventListener('change', updatePreference);
+    const observer = new IntersectionObserver(([entry]) => {
+      setActive(entry.isIntersecting);
+      if (entry.isIntersecting) setEntered(true);
+    }, { rootMargin: '150px' });
+    if (section.current) observer.observe(section.current);
+    return () => {
+      motion.removeEventListener('change', updatePreference);
+      shortScreen.removeEventListener('change', updatePreference);
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (manual) return;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const el = section.current;
+      if (!el) return;
+      const progress = Math.max(0, Math.min(1, -el.getBoundingClientRect().top / Math.max(1, el.offsetHeight - window.innerHeight)));
+      setPhase(Math.min(2, Math.floor(progress * 3)));
+      if (progressBar.current) progressBar.current.style.transform = `scaleX(${progress})`;
+    };
+    const scroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    update();
+    window.addEventListener('scroll', scroll, { passive: true });
+    window.addEventListener('resize', scroll);
+    return () => {
+      window.removeEventListener('scroll', scroll);
+      window.removeEventListener('resize', scroll);
+      cancelAnimationFrame(frame);
+    };
+  }, [manual]);
+
+  function choosePhase(index: number) {
+    if (manual) { setPhase(index); return; }
+    const el = section.current;
+    if (el) window.scrollTo({
+      top: window.scrollY + el.getBoundingClientRect().top + (el.offsetHeight - window.innerHeight) * (index / 3 + .12),
+      behavior: 'smooth',
+    });
+  }
+
+  return <section ref={section} className="project-story" data-manual={manual} aria-label="Scroll-driven stair and walkway study">
+    <div className="project-story-sticky">
+      <div className="project-story-top"><span>STUDY 01 / STAIRS & WALKWAY</span><a href="#about">Skip the story <ArrowDown size={14}/></a></div>
+      <div className="project-story-layout">
+        <div className="project-story-copy"><span className="eyebrow">0{phase + 1} / 03 · {chapters[phase].label.toUpperCase()}</span><h3>{chapters[phase].title}</h3><p>{chapters[phase].body}</p><div className="project-source"><img src={`${base}/images/projects/project-03.jpg`} alt="Original KDX archive image of the steel walkway and stairs used for this visual reconstruction" loading="lazy"/><span>FROM OUR PROJECT ARCHIVE<small>ORIGINAL STEEL MODEL / 03</small></span></div></div>
+        <div className="walkway-visual">
+          <div className="walkway-canvas" data-interactive={interactive} aria-label="Interactive walkway model">{entered && <WalkwayScene phase={phase} exploded={exploded} rotating={rotating} resetKey={resetKey} active={active} reduced={reduced} interactive={interactive}/>}</div>
+          <div className="walkway-controls"><div><button onClick={() => setExploded(!exploded)} aria-pressed={exploded}><Layers3 size={15}/>{exploded ? 'Assemble layers' : 'Separate layers'}</button><button onClick={() => setInteractive(!interactive)} aria-pressed={interactive}><Hand size={15}/>{interactive ? 'Finish exploring' : 'Drag to explore'}</button></div><div><button onClick={() => setRotating(!rotating)} aria-label={rotating ? 'Pause walkway rotation' : 'Rotate walkway'} aria-pressed={rotating}>{rotating ? <Pause size={16}/> : <Play size={16}/>}</button><button onClick={() => {setResetKey(key => key + 1); setExploded(false); setRotating(false); setInteractive(false);}} aria-label="Reset walkway view"><RotateCcw size={16}/></button></div></div>
+          <span className="walkway-hint">{interactive ? 'DRAG THE MODEL TO ROTATE' : 'SCROLL TO REVEAL · SELECT A STAGE TO JUMP AHEAD'}</span>
+        </div>
+      </div>
+      <div className="project-story-bottom"><div className="walkway-stages" role="group" aria-label="Walkway design stages">{chapters.map((chapter,index) => <button key={chapter.label} onClick={() => choosePhase(index)} aria-pressed={phase === index}><small>0{index+1}</small>{chapter.label}<i/></button>)}</div><div className="project-story-progress"><div ref={progressBar}/></div><div className="walkway-footnote"><span>{manual ? 'SELECT A STAGE TO EXPLORE' : 'SCROLL TO SEE THE DESIGN TAKE SHAPE'}</span><p>Visual reconstruction from an archive image. Architectural finishes are an illustrative design exploration.</p></div></div>
+    </div>
+  </section>;
 }

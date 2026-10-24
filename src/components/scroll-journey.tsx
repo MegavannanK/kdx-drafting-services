@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import { ArrowDown, ArrowUpRight, Check, MoveDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import './scroll-journey.css';
-import { projects } from '@/lib/projects';
 
 const JourneyScene = dynamic(() => import('./scroll-journey-scene'), { ssr: false, loading: () => <div className="journey-loading">Preparing the structure<span /></div> });
 
@@ -26,14 +25,15 @@ export default function ScrollJourney({ onExploreProject }: { onExploreProject: 
 
   useEffect(() => {
     const media = matchMedia('(prefers-reduced-motion: reduce)');
+    const shortScreen = matchMedia('(max-height: 600px)');
     const onPreference = () => {
-      setReduced(media.matches);
-      if (media.matches) { progress.current = .125; setChapter(0); }
+      setReduced(media.matches || shortScreen.matches);
+      if (media.matches || shortScreen.matches) { progress.current = .125; setChapter(0); }
     };
-    onPreference(); media.addEventListener('change', onPreference);
+    onPreference(); media.addEventListener('change', onPreference); shortScreen.addEventListener('change', onPreference);
     const observer = new IntersectionObserver(([entry]) => { setActive(entry.isIntersecting); if (entry.isIntersecting) setHasEntered(true); }, { rootMargin: '180px' });
     if (section.current) observer.observe(section.current);
-    return () => { media.removeEventListener('change', onPreference); observer.disconnect(); };
+    return () => { media.removeEventListener('change', onPreference); shortScreen.removeEventListener('change', onPreference); observer.disconnect(); };
   }, []);
 
   useEffect(() => {
@@ -61,9 +61,9 @@ export default function ScrollJourney({ onExploreProject }: { onExploreProject: 
     if (el) window.scrollTo({ top: window.scrollY + el.getBoundingClientRect().top + (el.offsetHeight - window.innerHeight) * (index * .25 + .08), behavior: 'smooth' });
   };
 
-  return <section id="approach" className="scroll-journey" ref={section} data-reduced-motion={reduced} aria-label="How KDX turns drawings into fabrication details">
+  return <section id="steel-process" className="scroll-journey" ref={section} data-reduced-motion={reduced} aria-label="How KDX turns drawings into fabrication details">
     <div className="journey-sticky">
-      <div className="journey-top"><span className="eyebrow"><span className="orange-dot" /> THE MAKING OF A STRUCTURE</span><a href="#services">Skip the story <ArrowDown size={13} /></a></div>
+      <div className="journey-top"><span className="eyebrow"><span className="orange-dot" /> STUDY 02 / FRAME & CONNECTIONS</span><a href="#about">Skip the story <ArrowDown size={13} /></a></div>
       <div className="journey-atmosphere" aria-hidden="true" />
       <div className="journey-scene" aria-label={chapters[chapter].title}>
         {hasEntered && <JourneyScene progress={progress} active={active} reduced={reduced} chapter={chapter} />}
@@ -72,7 +72,7 @@ export default function ScrollJourney({ onExploreProject }: { onExploreProject: 
         <span className="journey-chapter-count">0{chapter + 1}<span>/ 04</span></span>
         <h2>{chapters[chapter].heading}</h2><p>{chapters[chapter].body}</p>
         <div className="journey-output">{chapter === 3 ? <Check size={13} /> : <span className="output-cross">+</span>}{chapters[chapter].output}</div>
-        <button className="journey-cta" onClick={onExploreProject}>Explore {projects[0].name} in 3D <ArrowUpRight size={15} /></button>
+        <button className="journey-cta" onClick={onExploreProject}>View the Weston Shed project <ArrowUpRight size={15} /></button>
       </div>
       <div className="journey-annotation"><span /><div>{chapters[chapter].detail}<small>{chapter === 2 ? 'BOLTED END-PLATE / ILLUSTRATIVE DETAIL' : 'STEEL DETAILING / PROCESS VISUALISATION'}</small></div></div>
       <div className="journey-bottom">
