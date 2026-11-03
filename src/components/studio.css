@@ -1,0 +1,235 @@
+/* Fifth fold: paper, a connection diagram. KDX is the hub, the four
+   audiences are wired to it and coloured by service (steel in blue,
+   architecture in warm sand-ink). Construction lines are dashed; the open
+   node's wire is inked in as its timer. */
+.st{
+  --paper:#f6f3ec;--ink:#0d1a24;--text:#253741;--muted:#6b777e;--faint:#97a1a6;--rule:#25374124;
+  --blue:#2167a3;--warm:#a16d2f;--ease:cubic-bezier(.16,.84,.2,1);--hdr:88px;--gutter:6%;--hold:4.6s;
+  --nf:clamp(26px,min(2.6vw,4.8vh),48px);
+  position:relative;isolation:isolate;background:var(--paper);color:var(--text);
+  display:flex;flex-direction:column;gap:clamp(18px,3.4vh,44px);
+  height:100svh;min-height:640px;
+  padding:calc(var(--hdr) + clamp(6px,2.2vh,28px)) var(--gutter) clamp(20px,3.4vh,40px);
+  scroll-margin-top:-100px;
+}
+
+/* Daylight on a drafting table: warm sun from the upper left, a cool
+   bounce from the lower right, two slow window shafts, paper grain, and
+   soft shading where the night folds above and below meet the paper. */
+.st{background:linear-gradient(180deg,#f8f5ee 0%,#f4f1e9 55%,#efece4 100%)}
+.st-light{position:absolute;inset:0;z-index:-2;pointer-events:none;overflow:hidden;
+  background:
+    radial-gradient(ellipse 60% 55% at 8% -6%,#ffe6bf8c,transparent 70%),
+    radial-gradient(ellipse 45% 40% at 30% 10%,#fff6e466,transparent 70%),
+    radial-gradient(ellipse 55% 60% at 102% 108%,#cfe2f3a6,transparent 70%),
+    linear-gradient(180deg,#0a131c14,transparent 90px),
+    linear-gradient(0deg,#0a131c12,transparent 110px)}
+.st-light:before{content:'';position:absolute;inset:-20% -10%;
+  background:
+    linear-gradient(112deg,transparent 18%,#fff8ea8c 24%,transparent 31%),
+    linear-gradient(112deg,transparent 34%,#fff8ea59 38%,transparent 44%);
+  filter:blur(18px);mix-blend-mode:soft-light;opacity:.9;animation:st-shafts 38s ease-in-out infinite alternate}
+.st-light:after{content:'';position:absolute;inset:0;opacity:.35;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .4 0 0 0 0 .32 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+@keyframes st-shafts{from{translate:-4% 0}to{translate:6% 0}}
+
+/* Lamp pool under the sheet, tinted by the open service */
+.st-pool{grid-column:1/-1;grid-row:2/4;align-self:center;justify-self:center;width:min(900px,80%);aspect-ratio:2/1;border-radius:50%;pointer-events:none;
+  color:var(--kc,var(--blue));background:radial-gradient(closest-side,color-mix(in srgb,currentColor 13%,#fffaf0) 0%,#fffaf099 40%,transparent 100%);
+  transition:color 1.2s var(--ease);opacity:0}
+.st-graph.is-in .st-pool{opacity:1;transition:color 1.2s var(--ease),opacity 2s var(--ease) .3s}
+
+/* Drafting paper: a passive minor/major grid across the fold, and a
+   brighter copy revealed under the pointer like a lamp over the table. */
+.st:before,.st:after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(var(--gmaj) 1px,transparent 1px),linear-gradient(90deg,var(--gmaj) 1px,transparent 1px),
+    linear-gradient(var(--gmin) 1px,transparent 1px),linear-gradient(90deg,var(--gmin) 1px,transparent 1px);
+  background-size:120px 120px,120px 120px,24px 24px,24px 24px;background-position:calc(var(--gutter) * -1) -1px}
+.st:before{--gmaj:#2167a30f;--gmin:#2167a307;
+  mask-image:radial-gradient(ellipse 80% 75% at 50% 60%,#000 30%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 80% 75% at 50% 60%,#000 30%,transparent 100%)}
+.st:after{--gmaj:#2167a338;--gmin:#2167a31c;opacity:0;transition:opacity .6s;
+  mask-image:radial-gradient(circle 240px at var(--mx,50%) var(--my,50%),#000,transparent);-webkit-mask-image:radial-gradient(circle 240px at var(--mx,50%) var(--my,50%),#000,transparent)}
+.st:hover:after{opacity:1}
+@media(hover:none){.st:after{display:none}}
+
+/* Header: title left, one short statement right */
+.st-head{flex:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);align-items:end;gap:clamp(24px,5vw,96px)}
+.st-eyebrow{display:flex;align-items:center;gap:14px;font:500 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:clamp(10px,2vh,22px)}
+.st-eyebrow span{color:var(--blue)}
+.st-title{font-size:clamp(36px,min(4.2vw,6.8vh),88px);font-weight:450;line-height:1;letter-spacing:-.05em;color:var(--ink)}
+.st-title>.st-line{color:var(--ink)}
+.st-title em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.02em;color:var(--blue);font-size:1.1em}
+.st-line{display:block;width:fit-content;overflow:hidden;padding:0 .08em .1em 0;margin-bottom:-.1em}
+.st-line>span{display:inline-block;transform:translateY(105%);transition:transform 1.2s var(--ease)}
+.st-title.is-in .st-line>span{transform:none}
+.st-title.is-in .st-line:nth-child(2)>span{transition-delay:.1s}
+.st-lede{max-width:34ch;padding-bottom:.5em;font-size:16px;line-height:1.65;color:var(--muted);text-wrap:pretty}
+.st-eyebrow,.st-lede{opacity:0;transform:translateY(14px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.st-eyebrow.is-in,.st-lede.is-in{opacity:1;transform:none}
+.st-lede.is-in{transition-delay:.2s}
+
+/* The diagram */
+.st-graph{position:relative;flex:1;min-height:0;display:grid;
+  grid-template-columns:minmax(0,1fr) clamp(220px,min(21vw,44vh),360px) minmax(0,1fr);
+  grid-template-rows:auto minmax(0,1fr) minmax(0,1fr) auto;column-gap:clamp(40px,5vw,96px)}
+.st-graph[data-kind=steel],.st-graph[data-kind=both]{--kc:var(--blue)}
+.st-graph[data-kind=arch]{--kc:var(--warm)}
+
+.st-label{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;padding-bottom:clamp(10px,1.6vh,16px);border-bottom:1px solid var(--rule);
+  font:500 10.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.st-count b{display:inline-block;font-weight:500;color:var(--ink);animation:st-tick .6s var(--ease)}
+
+.st-legend{grid-column:1/-1;display:flex;gap:28px;padding-top:clamp(10px,1.6vh,16px);font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.st-legend span{display:inline-flex;align-items:center;gap:10px}
+.st-legend span:before{content:'';width:22px;height:2px;border-radius:2px;background:var(--blue)}
+.st-legend .st-arch:before{background:var(--warm)}
+
+/* Wires */
+.st-wires{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.st-wire{--c:var(--blue)}
+.st-wire.st-arch{--c:var(--warm)}
+.st-wire path{fill:none;stroke-linecap:round}
+.st-wire-base{stroke:var(--ink);stroke-opacity:.18;stroke-width:1;stroke-dasharray:2 6}
+.st-wire-in{stroke:var(--c);stroke-opacity:.42;stroke-width:1.2;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.6s var(--ease) calc(.5s + var(--i) * .14s),stroke-opacity .6s}
+.st-graph.is-in .st-wire-in{stroke-dashoffset:0}
+.st-wire-run{stroke:var(--c);stroke-width:2.2;stroke-dasharray:1;stroke-dashoffset:1;animation:st-run var(--hold) linear forwards;animation-play-state:paused}
+.st-graph[data-playing=true] .st-wire-run{animation-play-state:running}
+.st-graph[data-playing=false] .st-wire-run{animation:none;stroke-dashoffset:0;transition:none}
+.st-comet{fill:none;stroke:var(--c);stroke-width:3.4;stroke-linecap:round;stroke-dasharray:.09 1.3;stroke-dashoffset:.09;opacity:0;
+  filter:drop-shadow(0 0 4px color-mix(in srgb,var(--blue) 60%,transparent))}
+.st-wire.st-arch .st-comet{filter:drop-shadow(0 0 4px color-mix(in srgb,var(--warm) 60%,transparent))}
+.st-comet.is-back{animation:st-back .5s cubic-bezier(.55,0,.85,.4) forwards}
+.st-comet.is-fwd{animation:st-fwd .8s cubic-bezier(.2,.65,.3,1) .42s forwards}
+@keyframes st-back{0%{stroke-dashoffset:-1;opacity:1}85%{opacity:1}100%{stroke-dashoffset:.09;opacity:0}}
+@keyframes st-fwd{0%{stroke-dashoffset:.09;opacity:1}85%{opacity:1}100%{stroke-dashoffset:-1;opacity:0}}
+.st-spark{fill:var(--c);opacity:0;transition:opacity .8s}
+.st-graph.is-in .st-spark{opacity:.45}
+.st-graph.is-in .st-wire.is-active .st-spark{opacity:1}
+
+/* Hub: a small blueprint sheet, with structural grid lines through it */
+.st-grid{opacity:0;transition:opacity 1.4s var(--ease) .3s}
+.st-graph.is-in .st-grid{opacity:1}
+.st-grid path{fill:none;stroke:var(--ink);stroke-opacity:.16;stroke-width:1;stroke-dasharray:22 5 3 5}
+.st-grid circle{fill:var(--paper);stroke:var(--ink);stroke-opacity:.32}
+.st-grid text{font:500 10px var(--mono);fill:var(--muted);text-anchor:middle}
+
+.st-hub{position:relative;grid-column:2;grid-row:2/4;align-self:center;justify-self:center;width:100%;aspect-ratio:1;border-radius:18px;
+  background:linear-gradient(#ffffff09 1px,transparent 1px) 0 0/12px 12px,linear-gradient(90deg,#ffffff09 1px,transparent 1px) 0 0/12px 12px,
+    radial-gradient(120% 100% at 28% 12%,#1a3550,#0f2236 55%,#0b1825);
+  box-shadow:0 34px 60px -32px #0d1a24cc,0 0 0 1px #0d1a2422,0 0 0 7px var(--paper),0 0 0 8px #0d1a2412;
+  opacity:0;scale:.9;transition:opacity 1.2s var(--ease) .2s,scale 1.4s var(--ease) .2s}
+.st-graph.is-in .st-hub{opacity:1;scale:1}
+.st-hub-flash{position:absolute;inset:-9px;border-radius:24px;border:1.5px solid var(--kc,var(--blue));opacity:0;pointer-events:none;
+  animation:st-flash .9s var(--ease) .4s}
+@keyframes st-flash{0%{opacity:.9;scale:.98}100%{opacity:0;scale:1.07}}
+.st-coords{position:absolute;top:calc(100% + 18px);left:50%;translate:-50% 0;font:500 9.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+
+.sh{display:block;width:100%;height:100%;--dc:#8ec9ff;--dc2:#8ec9ff}
+.sh-arch{--dc:#e9c79c;--dc2:#e9c79c}
+.sh-both{--dc:#8ec9ff;--dc2:#e9c79c}
+.sh-frame{fill:none;stroke:#ffffff26;stroke-width:.8}
+.sh-crop{fill:none;stroke:#ffffff59;stroke-width:.8}
+.sh-line{fill:none;stroke:var(--dc);stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round}
+.sh-heavy{stroke-width:2.6}
+.sh-thin,.sh-gap{fill:none;stroke:var(--dc);stroke-opacity:.6;stroke-width:.7}
+.sh-c2{fill:none;stroke:var(--dc2);stroke-width:1}
+.sh-fill{fill:url(#sh-hatch)}
+#sh-hatch line{stroke:var(--dc);stroke-opacity:.45;stroke-width:.8}
+.sh-chain{fill:none;stroke:#ffffff47;stroke-width:.6;stroke-dasharray:10 3 2 3}
+.sh-dim path{fill:none;stroke:#cfdbe4;stroke-opacity:.55;stroke-width:.6}
+.sh-dim text{font:500 6.6px var(--mono);fill:#cfdbe4;letter-spacing:.06em}
+.sh-logo{font:400 18px 'Instrument Serif',Georgia,serif;fill:#f2f0ea;letter-spacing:.04em}
+.sh-logo tspan{fill:#8ec9ff}
+.sh-small{font:500 6.4px var(--mono);fill:#8fa3b1;letter-spacing:.14em}
+.sh-name{font:500 8px var(--mono);fill:#f2f0ea;letter-spacing:.12em}
+/* Each drawing is inked in line by line; dimensions and text follow. */
+.sh-art path:not(.sh-chain){stroke-dasharray:640;stroke-dashoffset:640;animation:sh-draw 1.8s var(--ease) forwards}
+.sh-art>:nth-child(n+3) path,.sh-art>path:nth-child(n+3){animation-delay:.12s}
+.sh-art>path:nth-child(n+5){animation-delay:.24s}
+.sh-art>path:nth-child(n+7){animation-delay:.36s}
+.sh-fill{fill-opacity:0;animation:sh-draw 1.8s var(--ease) forwards,sh-fill .8s ease .9s forwards!important}
+.sh-chain,.sh-dim,.sh-title{animation:sh-fade .8s ease .5s both}
+.sh-dim path{stroke-dasharray:none!important;stroke-dashoffset:0!important;animation:none!important}
+@keyframes sh-draw{to{stroke-dashoffset:0}}
+@keyframes sh-fill{to{fill-opacity:1}}
+@keyframes sh-fade{from{opacity:0}to{opacity:1}}
+
+/* Nodes */
+.st-nodes{display:contents;list-style:none;margin:0;padding:0}
+.st-node{align-self:center;opacity:0;translate:-18px 0;transition:opacity 1s var(--ease) calc(.6s + var(--i) * .12s),translate 1.2s var(--ease) calc(.6s + var(--i) * .12s)}
+.st-node:nth-child(1){grid-area:2/1;justify-self:start}
+.st-node:nth-child(2){grid-area:2/3;justify-self:end;translate:18px 0}
+.st-node:nth-child(3){grid-area:3/3;justify-self:end;translate:18px 0}
+.st-node:nth-child(4){grid-area:3/1;justify-self:start}
+.st-graph.is-in .st-node{opacity:1;translate:0 0}
+.st-node{--tc:var(--blue)}
+.st-node.st-arch{--tc:var(--warm)}
+
+.st-node a{display:flex;align-items:flex-start;gap:clamp(16px,1.6vw,26px);outline-offset:8px;border-radius:12px}
+.st-node:nth-child(1) a,.st-node:nth-child(4) a{flex-direction:row-reverse;text-align:right}
+.st-node-text{display:flex;flex-direction:column;width:clamp(220px,21vw,340px)}
+.st-node:nth-child(1) .st-node-text,.st-node:nth-child(4) .st-node-text{align-items:flex-end}
+
+.st-dot{flex:none;width:30px;height:30px;margin-top:calc(24px + var(--nf) * .52 - 15px);border-radius:50%;display:grid;place-items:center;
+  font:500 10px/1 var(--mono);letter-spacing:.02em;color:var(--tc);background:var(--paper);box-shadow:inset 0 0 0 1.2px var(--tc);
+  transition:background .5s,color .5s,box-shadow .5s,scale .5s var(--ease)}
+.st-node.st-both .st-dot{color:var(--blue);box-shadow:inset 0 0 0 1.2px var(--blue)}
+.st-node.is-active .st-dot{background:var(--tc);color:#fff;box-shadow:0 0 0 6px color-mix(in srgb,var(--tc) 13%,transparent)}
+.st-node.st-both.is-active .st-dot{color:#fff;background:linear-gradient(135deg,var(--blue) 50%,var(--warm) 50%)}
+
+.st-tag{display:inline-flex;gap:10px;height:14px;align-items:center;margin-bottom:10px;font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tc);opacity:.55;transition:opacity .5s}
+.st-tag span{color:var(--muted)}
+.st-node.st-both .st-tag{background:linear-gradient(90deg,var(--blue),var(--warm));-webkit-background-clip:text;background-clip:text;color:transparent}
+.st-node.st-both .st-tag span{-webkit-text-fill-color:var(--muted)}
+.st-name{display:inline-flex;align-items:center;gap:10px;font-size:var(--nf);font-weight:450;line-height:1.04;letter-spacing:-.045em;color:var(--faint);white-space:nowrap;transition:color .6s var(--ease)}
+.st-go{flex:none;opacity:0;translate:-6px 6px;color:var(--tc);transition:opacity .4s,translate .5s var(--ease)}
+.st-node:nth-child(1) .st-name,.st-node:nth-child(4) .st-name{flex-direction:row-reverse}
+.st-node:nth-child(1) .st-go,.st-node:nth-child(4) .st-go{rotate:-90deg}
+.st-detail{display:block;min-height:3.2em;padding-top:8px;font-size:15px;line-height:1.55;color:var(--muted);max-width:30ch;
+  opacity:0;translate:0 6px;transition:opacity .4s,translate .6s var(--ease)}
+.st-node.is-active .st-tag{opacity:1}
+.st-node.is-active .st-name{color:var(--ink)}
+.st-node.is-active .st-detail{opacity:1;translate:0 0;transition:opacity .6s .15s,translate .8s var(--ease) .15s}
+.st-node a:hover .st-go,.st-node a:focus-visible .st-go{opacity:1;translate:0 0}
+
+@keyframes st-run{to{stroke-dashoffset:0}}
+@keyframes st-ping{0%{scale:.6;opacity:1}100%{scale:1.8;opacity:0}}
+@keyframes st-tick{from{opacity:0;transform:translateY(60%)}to{opacity:1;transform:none}}
+
+@media(max-width:1100px){.st{--hdr:76px}.st-lede{font-size:15px}.st-detail{font-size:14px}.st-graph{column-gap:32px}.st-node-text{width:clamp(190px,24vw,260px)}}
+@media(max-height:760px) and (min-width:900px){.st-lede{font-size:14px}.st-detail{font-size:13.5px;min-height:3em}.st-coords{display:none}}
+@media(max-height:599px) and (min-width:900px){.st{height:auto}.st-graph{flex:none;height:440px}}
+
+/* Phones and portrait tablets: a vertical spine. The hub sits on top and
+   every node hangs off one line, all open, still cycling. */
+@media(max-width:899px){
+  .st{height:auto;min-height:0;gap:36px}
+  .st-head{grid-template-columns:1fr;gap:18px}
+  .st-title{font-size:clamp(38px,10.4vw,68px);line-height:1.04}
+  .st-lede{font-size:15px;max-width:none}
+  .st-graph{display:flex;flex-direction:column;gap:30px;--nf:clamp(26px,7.4vw,40px)}
+  .st-graph:before{display:none}
+  .st-label{margin-bottom:6px}
+  .st-hub{width:210px;align-self:flex-start}
+  .st-coords,.st-grid,.st-pool{display:none}
+  .st:before{background-position:-1px -1px}
+  .st-nodes{display:flex;flex-direction:column;gap:30px}
+  .st-node,.st-node:nth-child(n){justify-self:auto;translate:0 18px}
+  .st-graph.is-in .st-node{translate:0 0}
+  .st-node a,.st-node:nth-child(n) a{flex-direction:row;text-align:left;padding-left:90px}
+  .st-node:nth-child(n) .st-node-text{align-items:flex-start;width:auto;flex:1}
+  .st-node:nth-child(n) .st-name{flex-direction:row;color:var(--ink)}
+  .st-node:nth-child(n) .st-go{rotate:0deg;opacity:.5;translate:0 0}
+  .st-tag{opacity:1}
+  .st-detail{opacity:1;translate:0 0;min-height:0;font-size:14px}
+  .st-legend{flex-wrap:wrap;gap:12px 24px;padding-top:0}
+  .st-count{display:none}
+}
+@media(max-width:800px){.st{scroll-margin-top:-25px}}
+@media(max-width:560px){.st{--hdr:70px}}
+
+@media(prefers-reduced-motion:reduce){
+  .st *,.st *:before,.st *:after,.st-graph:before,.st-hub:before{transition:none!important;animation:none!important}
+  .st-line>span,.st-eyebrow,.st-lede,.st-node,.st-hub{transform:none;translate:0 0!important;scale:1!important;opacity:1}
+  .st-wire-in{stroke-dashoffset:0}.st-wire-run{stroke-dashoffset:0}.st-spark,.st-comet,.st-hub-flash{display:none}.st-light:before{animation:none}
+}

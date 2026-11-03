@@ -1,0 +1,163 @@
+/* Second fold: continues the hero's night palette and fits one screen.
+   Steel reads in sky blue, architecture in warm sand. */
+.xp{
+  --night:#0a131c;--panel:#0d1823;--chalk:#f2f0ea;--soft:#a3b2bc;--dim:#6c808e;--rule:#ffffff17;
+  --sky:#8ec9ff;--sand:#e9c79c;--ease:cubic-bezier(.16,.84,.2,1);--p:0;--hdr:88px;--gutter:6%;
+  position:relative;isolation:isolate;background:var(--night);color:var(--chalk);
+  display:flex;flex-direction:column;height:100svh;min-height:600px;
+  padding:calc(var(--hdr) + clamp(6px,2.2vh,28px)) var(--gutter) clamp(18px,3.2vh,36px);
+  scroll-margin-top:-100px; /* anchor lands on the section itself; its padding clears the header */
+}
+.xp:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:linear-gradient(#ffffff05 1px,transparent 1px),linear-gradient(90deg,#ffffff05 1px,transparent 1px);background-size:56px 56px;
+  mask-image:linear-gradient(180deg,transparent 0,#000 18%,transparent 70%);-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 18%,transparent 70%)}
+
+/* Heading: one line on wide screens, so the panels get the height. */
+.xp-head{flex:none;margin-bottom:clamp(14px,2.6vh,32px)}
+.xp-eyebrow{display:flex;align-items:center;gap:14px;font:500 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin-bottom:clamp(8px,1.6vh,18px)}
+.xp-eyebrow span{color:var(--sky)}
+.xp-title{font-size:clamp(34px,min(4.3vw,6.6vh),88px);font-weight:450;line-height:1;letter-spacing:-.05em}
+.xp-title em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.02em;color:var(--sky);font-size:1.1em}
+.xp-title>.xp-line{color:var(--chalk)}
+.xp-line{display:inline-block;overflow:hidden;vertical-align:top;padding:0 .08em .1em 0;margin-bottom:-.1em}
+.xp-line>span{display:inline-block;transform:translateY(105%);transition:transform 1.2s var(--ease)}
+.xp-title.is-in .xp-line>span{transform:none}
+.xp-title.is-in .xp-line:nth-child(2)>span{transition-delay:.1s}
+.xp-eyebrow{opacity:0;transform:translateY(12px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.xp-eyebrow.is-in{opacity:1;transform:none}
+
+/* Split */
+.xp-split{flex:1;min-height:0;display:flex;gap:14px}
+.xp-panel{position:relative;flex:1 1 0;min-width:0;overflow:hidden;border-radius:24px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--rule);
+  display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;
+  transition:flex-grow 1s var(--ease),box-shadow .5s;clip-path:inset(100% 0 0 0 round 24px)}
+.xp-panel.is-open{flex-grow:1.75}
+.xp-panel:not(.is-open):hover{flex-grow:1.1;box-shadow:inset 0 0 0 1px #ffffff2e}
+.xp-split.is-in .xp-panel{clip-path:inset(0 0 0 0 round 24px);transition:flex-grow 1s var(--ease),box-shadow .5s,clip-path 1.3s var(--ease)}
+.xp-split.is-in .xp-panel:nth-child(2){transition-delay:0s,0s,.12s}
+.xp-panel:after{content:'';position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .5s;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),#ffffff10,transparent 70%)}
+.xp-panel:hover:after{opacity:1}
+.is-steel{--accent:var(--sky)}.is-architecture{--accent:var(--sand)}
+
+/* Media. Steel's model owns the middle row, so the copy can never sit on it.
+   Architecture's photograph fills the card behind a scrim. */
+.xp-media{grid-row:2;grid-column:1;min-height:0;position:relative}
+.xp-media img{width:100%;height:100%;object-fit:cover;transform:scale(1.12);transition:transform 2s var(--ease),filter 1s var(--ease)}
+.xp-split.is-in .xp-media img{transform:scale(1.03)}
+.xp-split.is-in .is-open .xp-media img{transform:scale(1)}
+.is-steel{background:radial-gradient(ellipse at 50% 40%,#132638 0%,var(--panel) 65%)}
+.is-steel:before{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(#8ec9ff0c 1px,transparent 1px),linear-gradient(90deg,#8ec9ff0c 1px,transparent 1px);background-size:40px 40px;
+  mask-image:radial-gradient(ellipse at 50% 40%,#000 15%,transparent 72%);-webkit-mask-image:radial-gradient(ellipse at 50% 40%,#000 15%,transparent 72%)}
+.is-steel .xp-media{margin:0 clamp(18px,3%,48px);mix-blend-mode:screen}
+.is-steel .xp-media img{object-fit:contain;filter:invert(1) hue-rotate(180deg) saturate(.85) brightness(1.05)}
+.is-steel:not(.is-open) .xp-media img{filter:invert(1) hue-rotate(180deg) saturate(.5) brightness(.8)}
+.is-architecture .xp-media{grid-row:1/-1;transform:translateY(calc((var(--p) - .5) * -30px)) scale(1.04)}
+.is-architecture .xp-media img{object-position:62% 40%;filter:saturate(.95) brightness(.92)}
+.is-architecture:not(.is-open) .xp-media img{filter:saturate(.6) brightness(.6)}
+.xp-scrim{grid-row:1/-1;grid-column:1;pointer-events:none;position:relative;z-index:1}
+.is-architecture .xp-scrim{background:linear-gradient(180deg,#0a131c8c 0%,transparent 20%,transparent 36%,#0a131cd0 66%,#0a131c 100%)}
+
+.xp-sweep{position:absolute;top:0;bottom:0;left:0;width:1px;z-index:2;pointer-events:none;background:linear-gradient(180deg,transparent,var(--accent) 30%,var(--accent) 70%,transparent);box-shadow:0 0 18px var(--accent);opacity:0;animation:xp-sweep 1.4s var(--ease) .1s}
+
+/* Top rail */
+.xp-top{grid-row:1;grid-column:1;position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:clamp(16px,2.4vh,26px) clamp(22px,2vw,30px);font:500 10.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.xp-index{display:inline-flex;align-items:center;gap:10px;color:var(--chalk);white-space:nowrap}
+.xp-index i{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.xp-index small{font:inherit;color:var(--accent);margin-left:8px;padding-left:12px;border-left:1px solid var(--rule);transition:opacity .5s}
+.xp-caption{font-size:10px;color:var(--dim);white-space:nowrap;transition:opacity .5s}
+.xp-panel:not(.is-open) .xp-caption,.xp-panel:not(.is-open) .xp-index small{opacity:0}
+
+/* Body */
+.xp-body{grid-row:3;grid-column:1;position:relative;z-index:2;padding:0 clamp(24px,2.6vw,46px) clamp(22px,3.4vh,42px);max-width:680px}
+.xp-body h3{font-size:clamp(28px,min(2.9vw,5.2vh),56px);font-weight:450;line-height:1.02;letter-spacing:-.045em;text-wrap:balance}
+.xp-intro{margin-top:clamp(6px,1vh,12px);font-size:15px;line-height:1.55;color:var(--soft)}
+
+.xp-more{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .9s var(--ease),opacity .5s}
+.xp-more>div{min-height:0;overflow:hidden}
+.is-open .xp-more{grid-template-rows:1fr;opacity:1;transition:grid-template-rows .9s var(--ease) .15s,opacity .7s .35s}
+.xp-list{list-style:none;margin:clamp(12px,2.2vh,24px) 0 clamp(14px,2.4vh,26px);padding:0;display:grid;grid-template-columns:1fr 1fr;column-gap:24px;min-width:440px}
+.xp-list li{display:flex;align-items:baseline;gap:12px;padding:clamp(8px,1.3vh,13px) 0;border-top:1px solid var(--rule);font-size:14px;white-space:nowrap;opacity:0;transform:translateY(8px);transition:opacity .6s,transform .6s var(--ease)}
+.is-open .xp-list li{opacity:1;transform:none;transition-delay:calc(.45s + var(--i) * .06s)}
+.xp-list span{font:500 10px var(--mono);color:var(--accent)}
+
+/* Buttons share the hero's pill language. */
+.xp-button{display:inline-flex;align-items:center;gap:16px;height:clamp(44px,5.6vh,52px);padding:0 5px 0 22px;border-radius:999px;background:var(--chalk);color:#0d1a24;font-size:14px;font-weight:500;white-space:nowrap;transition:transform .3s var(--ease),box-shadow .3s,background .3s}
+.xp-button>span{display:grid;place-items:center;width:clamp(34px,4.4vh,42px);aspect-ratio:1;border-radius:50%;background:#0d1a24;color:var(--chalk);transition:transform .35s var(--ease)}
+.xp-button:hover{transform:translateY(-2px);box-shadow:0 18px 40px -14px color-mix(in srgb,var(--accent,var(--sky)) 55%,transparent)}
+.xp-button:hover>span{transform:rotate(45deg)}
+.xp-button.is-ghost{background:transparent;color:var(--chalk);box-shadow:inset 0 0 0 1px #ffffff33}
+.xp-button.is-ghost>span{background:var(--chalk);color:#0d1a24}
+.xp-button.is-ghost:hover{background:#ffffff0d;box-shadow:inset 0 0 0 1px #ffffff55}
+
+/* Collapsed panel: the whole card is the control. */
+.xp-hit{position:absolute;inset:0;z-index:4;background:none;padding:0}
+.xp-panel.is-open .xp-hit{pointer-events:none}
+.xp-explore{position:absolute;right:16px;top:clamp(10px,1.8vh,18px);display:inline-flex;align-items:center;gap:12px;height:42px;padding:0 5px 0 18px;border-radius:999px;background:#ffffff12;box-shadow:inset 0 0 0 1px #ffffff26;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:13px;color:var(--chalk);transition:opacity .4s,background .3s}
+.xp-explore svg{box-sizing:content-box;padding:8px;border-radius:50%;background:var(--chalk);color:#0d1a24;transition:transform .4s var(--ease)}
+.xp-hit:hover .xp-explore{background:#ffffff22}
+.xp-hit:hover .xp-explore svg{transform:rotate(90deg)}
+.xp-panel.is-open .xp-explore{opacity:0}
+.xp-hit:focus-visible{outline:2px solid var(--accent);outline-offset:-6px;border-radius:24px}
+
+/* Both: one quiet line at the foot. */
+.xp-both{flex:none;margin-top:clamp(10px,1.6vh,14px);display:flex;align-items:center;justify-content:space-between;gap:24px;padding:6px 6px 6px clamp(22px,2.4vw,40px);border-radius:999px;box-shadow:inset 0 0 0 1px var(--rule);background:linear-gradient(90deg,#e9c79c0d,#8ec9ff0f);
+  opacity:0;transform:translateY(14px);transition:opacity 1s var(--ease) .3s,transform 1s var(--ease) .3s}
+.xp-both.is-in{opacity:1;transform:none}
+.xp-both p{font-size:15px;color:var(--soft)}
+.xp-both strong{font-weight:500;color:var(--chalk);margin-right:6px}
+
+.xp-dots{display:none}
+.xp-both .xp-button em{display:none;font-style:normal;color:var(--soft);margin-right:-10px}
+
+@keyframes xp-sweep{0%{left:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:100%;opacity:0}}
+
+/* Short laptop screens: keep the essentials, drop the list. */
+@media(max-height:760px) and (min-width:900px){
+  .xp-list{display:none}
+  .xp-more>div{padding-top:clamp(12px,2vh,20px)}
+}
+@media(max-width:1100px){.xp{--hdr:76px}}
+/* Very short windows: stop forcing one screen rather than crushing the panels. */
+@media(max-height:599px) and (min-width:900px){.xp{height:auto}.xp-split{flex:none;height:440px}}
+
+/* Phones and portrait tablets: a swipeable pair of cards that fits the screen. */
+@media(max-width:899px){
+  .xp{height:auto;min-height:100svh;--gutter:6%}
+  .xp-title{font-size:clamp(34px,9.6vw,64px);line-height:1.04}
+  .xp-split{flex:none;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+    margin:0 calc(var(--gutter) * -1);padding:0 var(--gutter);scroll-padding:0 var(--gutter);
+    height:clamp(340px,calc(100svh - var(--hdr) - 270px),620px)}
+  .xp-split::-webkit-scrollbar{display:none}
+  .xp-panel{flex:0 0 min(86%,440px);scroll-snap-align:start;border-radius:22px}
+  .xp-panel.is-open{flex-grow:0}
+  .xp-media img{transform:none!important}
+  .is-steel .xp-media{margin:0 16px}
+  .is-architecture .xp-media{transform:none}
+  .xp-top{padding:16px 18px}
+  .xp-caption,.xp-index small{display:none}
+  .xp-body{padding:0 20px 20px}
+  .xp-body h3{font-size:clamp(28px,7.6vw,40px)}
+  .xp-intro{font-size:14px}
+  .xp-list{min-width:0;column-gap:14px;margin:14px 0 16px}
+  .xp-list li{font-size:13px;gap:8px;padding:9px 0;white-space:normal}
+  .xp-dots{display:flex;justify-content:center;gap:8px;padding:14px 0 4px}
+  .xp-dots button{width:22px;height:4px;padding:0;border-radius:4px;background:#ffffff26;transition:width .4s var(--ease),background .3s}
+  .xp-dots button[aria-current=true]{width:40px;background:var(--chalk)}
+  .xp-both{margin-top:12px;padding:0;box-shadow:none;background:none}
+  .xp-both p{display:none}
+  .xp-both .xp-button{width:100%;justify-content:space-between;font-size:14px}
+  .xp-both .xp-button em{display:inline}
+}
+@media(max-width:800px){.xp{scroll-margin-top:-25px}}
+@media(max-width:560px){.xp{--hdr:70px}}
+@media(max-width:899px) and (max-height:720px){.xp-list{display:none}.xp-more>div{padding-top:14px}}
+@media(max-width:899px) and (max-height:700px){.xp-title{font-size:clamp(30px,8.4vw,44px)}.xp-eyebrow{margin-bottom:6px}.xp-head{margin-bottom:12px}}
+
+@media(prefers-reduced-motion:reduce){
+  .xp *,.xp-panel{transition:none!important;animation:none!important}
+  .xp-line>span,.xp-eyebrow,.xp-both,.xp-list li{transform:none;opacity:1}
+  .xp-panel{clip-path:none}
+  .xp-media{transform:none}
+}

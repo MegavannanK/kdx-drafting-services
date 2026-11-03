@@ -1,0 +1,101 @@
+/* Fourth fold: back to night. One pinned screen; scroll builds the frame. */
+.pr{
+  --night:#0a131c;--chalk:#f2f0ea;--soft:#a3b2bc;--dim:#6c808e;--rule:#ffffff17;--sky:#8ec9ff;
+  --ease:cubic-bezier(.16,.84,.2,1);--hdr:88px;--gutter:6%;
+  position:relative;height:420svh;background:var(--night);color:var(--chalk);scroll-margin-top:0;
+}
+.pr-pin{position:sticky;top:0;height:100svh;min-height:600px;overflow:hidden;isolation:isolate;
+  display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+  padding:calc(var(--hdr) + clamp(6px,2.2vh,28px)) var(--gutter) clamp(18px,3.2vh,36px)}
+.pr-pin:before{content:'';position:absolute;inset:0;z-index:-2;pointer-events:none;
+  background-image:linear-gradient(#ffffff05 1px,transparent 1px),linear-gradient(90deg,#ffffff05 1px,transparent 1px);background-size:56px 56px;
+  mask-image:radial-gradient(ellipse at 66% 50%,#000 10%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at 66% 50%,#000 10%,transparent 70%)}
+.pr-glow{position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse 50% 55% at 68% 52%,#1d3a52a6,transparent 70%),linear-gradient(90deg,var(--night) 10%,transparent 48%)}
+.pr-scene{position:absolute;z-index:-1;top:10%;bottom:12%;right:0;width:64%;pointer-events:none;
+  opacity:0;transform:translateY(30px) scale(.97);transition:opacity 1.4s var(--ease),transform 1.6s var(--ease)}
+.pr.is-in .pr-scene{opacity:1;transform:none}
+.pr-scene{-webkit-mask-image:linear-gradient(90deg,transparent,#000 22%),linear-gradient(180deg,transparent,#000 12%,#000 85%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent,#000 22%),linear-gradient(180deg,transparent,#000 12%,#000 85%,transparent);mask-composite:intersect}
+.pr-copy h3 em{display:block}
+.pr-scene canvas{display:block;touch-action:auto!important}
+.pr-loading{height:100%;display:grid;place-items:center}
+.pr-loading span{width:60px;height:1px;background:var(--sky);animation:pr-pulse 1.4s ease-in-out infinite}
+
+/* Heading */
+.pr-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
+.pr-eyebrow{display:flex;align-items:center;gap:14px;font:500 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin-bottom:clamp(8px,1.6vh,18px)}
+.pr-eyebrow span{color:var(--sky)}
+.pr-title{font-size:clamp(30px,min(3.2vw,5vh),64px);font-weight:450;line-height:1;letter-spacing:-.05em}
+.pr-title em,.pr-copy h3 em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.02em;color:var(--sky);font-size:1.1em}
+.pr-head>div,.pr-skip{opacity:0;transform:translateY(14px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.pr.is-in .pr-head>div,.pr.is-in .pr-skip{opacity:1;transform:none}
+.pr-skip{display:inline-flex;align-items:center;gap:10px;height:40px;padding:0 16px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--rule);font-size:13px;color:var(--soft);transition:color .3s,box-shadow .3s,opacity 1s var(--ease),transform 1s var(--ease)}
+.pr-skip:hover{color:var(--chalk);box-shadow:inset 0 0 0 1px #ffffff44}
+
+/* Chapter copy: one step at a time, rising in. */
+.pr-copy{align-self:center;width:min(38%,520px);padding:clamp(10px,2vh,24px) 0}
+.pr-copy>*{animation:pr-rise .8s var(--ease) both}
+.pr-copy>:nth-child(2){animation-delay:.06s}.pr-copy>:nth-child(3){animation-delay:.12s}.pr-copy>:nth-child(n+4){animation-delay:.18s}
+.pr-you{display:flex;align-items:center;gap:14px;font:500 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.pr-num{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;box-shadow:inset 0 0 0 1px #8ec9ff55;color:var(--sky);letter-spacing:0;background:#8ec9ff0d}
+.pr-copy h3{margin-top:clamp(14px,2.6vh,28px);font-size:clamp(30px,min(3.3vw,5.6vh),60px);font-weight:450;line-height:1.04;letter-spacing:-.045em;text-wrap:balance}
+.pr-body{margin-top:clamp(12px,2.2vh,22px);max-width:400px;font-size:15px;line-height:1.65;color:var(--soft)}
+.pr-output{display:inline-flex;align-items:center;gap:12px;margin-top:clamp(14px,2.6vh,28px);height:34px;padding:0 16px;border-radius:999px;background:#ffffff0a;box-shadow:inset 0 0 0 1px var(--rule);font:500 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#c9d6de}
+.pr-output i{width:6px;height:6px;border-radius:50%;background:var(--sky);box-shadow:0 0 10px var(--sky)}
+.pr-link{display:flex;align-items:center;gap:10px;margin-top:14px;padding:6px 0;background:none;color:var(--sky);font-size:14px}
+.pr-link svg{transition:transform .3s var(--ease)}
+.pr-link:hover svg{transform:translate(2px,-2px)}
+
+/* Rail: four steps, each filling as you scroll through it. */
+.pr-foot{opacity:0;transform:translateY(16px);transition:opacity 1s var(--ease) .2s,transform 1s var(--ease) .2s}
+.pr.is-in .pr-foot{opacity:1;transform:none}
+.pr-rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,2vw,28px)}
+.pr-rail button{display:flex;flex-direction:column;gap:12px;padding:10px 0 4px;background:none;text-align:left;color:var(--dim);font-size:15px;transition:color .4s}
+.pr-rail button:hover{color:var(--soft)}
+.pr-rail button.is-active{color:var(--chalk)}.pr-rail button.is-done{color:var(--soft)}
+.pr-rail-label{display:flex;align-items:baseline;gap:12px}
+.pr-rail-label b{font:500 10.5px var(--mono);font-weight:500;letter-spacing:.1em;color:inherit}
+.pr-rail button.is-active b,.pr-rail button.is-done b{color:var(--sky)}
+.pr-rail-bar{display:block;height:2px;border-radius:2px;background:#ffffff14;overflow:hidden}
+.pr-rail-bar i{display:block;height:100%;background:var(--sky);transform:scaleX(0);transform-origin:left;will-change:transform}
+.pr[data-manual=true] .pr-rail-bar i{transition:transform .6s var(--ease)}
+.pr-note{display:flex;justify-content:space-between;gap:24px;margin-top:clamp(10px,1.8vh,18px);font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.pr-note span{text-align:right}
+
+@keyframes pr-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes pr-pulse{0%,100%{opacity:.2}50%{opacity:1}}
+
+@media(max-width:1100px){.pr{--hdr:76px}.pr-copy{width:42%}.pr-scene{width:62%}}
+@media(max-height:760px) and (min-width:761px){.pr-body{font-size:14px}.pr-note span{display:none}}
+
+/* Phones: copy above, the frame below, rail at the foot. */
+@media(max-width:760px){
+  .pr-scene{-webkit-mask-image:linear-gradient(180deg,transparent,#000 15%,#000 85%,transparent);mask-image:linear-gradient(180deg,transparent,#000 15%,#000 85%,transparent)}
+  .pr{height:380svh}
+  .pr-pin{min-height:620px}
+  .pr-head{align-items:flex-end}
+  .pr-title{font-size:clamp(28px,8vw,40px)}
+  .pr-skip{display:none}
+  .pr-copy{align-self:start;width:100%;padding-top:clamp(14px,3vh,28px)}
+  .pr-copy h3{font-size:clamp(26px,7.4vw,36px);margin-top:14px}
+  .pr-body{font-size:14px;line-height:1.55;margin-top:10px}
+  .pr-output{margin-top:12px;height:30px;font-size:9.5px}
+  .pr-link{margin-top:6px}
+  .pr-glow{background:radial-gradient(ellipse 80% 40% at 50% 74%,#1d3a52a6,transparent 70%),linear-gradient(180deg,var(--night) 30%,transparent 62%)}
+  .pr-scene{top:auto;bottom:15%;height:40%;width:110%;right:-5%}
+  .pr-rail{gap:10px}
+  .pr-rail button{font-size:12px;gap:9px}
+  .pr-rail-label{flex-direction:column;gap:3px}
+  .pr-note{font-size:9px}.pr-note span{display:none}
+}
+@media(max-width:560px){.pr{--hdr:70px}}
+@media(max-width:760px) and (max-height:740px){.pr-body{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.pr-scene{height:36%}}
+
+/* Short windows and reduced motion: no pin, buttons drive the steps. */
+.pr[data-manual=true]{height:auto}
+.pr[data-manual=true] .pr-pin{position:relative;height:100svh;min-height:640px}
+
+@media(prefers-reduced-motion:reduce){
+  .pr *{animation:none!important;transition:none!important}
+  .pr-scene,.pr-head>div,.pr-skip,.pr-foot{opacity:1;transform:none}
+}

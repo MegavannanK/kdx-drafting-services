@@ -9,6 +9,8 @@ npm ci
 npm run dev -- --port 3000
 ```
 
+The development server listens on this computer only. For a controlled remote preview, explicitly choose a network hostname for that session and restrict who can reach it.
+
 The enquiry form prepares a draft in the visitor’s email application. It does not send mail or store form submissions.
 
 ## Validation and static export
