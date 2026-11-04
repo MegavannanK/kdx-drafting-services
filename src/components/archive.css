@@ -11,7 +11,8 @@
 
 /* Hero */
 .ar-hero{padding:calc(var(--hdr) + clamp(36px,8vh,96px)) var(--gutter) clamp(28px,5vh,56px)}
-.ar-crumb{display:flex;align-items:center;gap:12px;margin-bottom:clamp(18px,3vh,32px);font:500 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.ar-top{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:clamp(18px,3vh,32px)}
+.ar-crumb{display:flex;align-items:center;gap:12px;font:500 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .ar-crumb a{display:inline-flex;align-items:center;gap:8px;color:var(--text);transition:color .25s}
 .ar-crumb a:hover{color:var(--blue)}
 .ar-crumb a svg{transition:transform .3s var(--ease)}.ar-crumb a:hover svg{transform:translateX(-3px)}
@@ -24,6 +25,16 @@
 .ar-title.is-in .ar-line>span{transform:none}
 .ar-title.is-in .ar-line:nth-child(2)>span{transition-delay:.1s}
 .ar-lede{margin:0 0 .6em;max-width:34ch;font-size:15.5px;line-height:1.6;color:var(--muted);transition-delay:.25s!important}
+
+/* Discipline switch: the two archives, one tap apart. Dot colours match
+   the home page badges: blue for steel, warm for architecture. */
+.ar-switch{display:flex;gap:2px;padding:4px;border-radius:999px;background:#ece9e1;box-shadow:inset 0 0 0 1px var(--rule)}
+.ar-switch a{--k:var(--blue);display:inline-flex;align-items:center;gap:9px;height:34px;padding:0 15px 0 12px;border-radius:999px;font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);white-space:nowrap;transition:background .3s,color .3s,box-shadow .3s}
+.ar-switch a.is-arch{--k:#a16d2f}
+.ar-switch a i{width:6px;height:6px;border-radius:50%;background:var(--k);opacity:.6;transition:opacity .3s}
+.ar-switch a:hover{color:var(--ink)}
+.ar-switch a[aria-current=page]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px #0d1a2414,0 6px 16px -10px #0d1a2440,inset 0 0 0 1px var(--rule)}
+.ar-switch a[aria-current=page] i,.ar-switch a:hover i{opacity:1}
 
 /* Filter bar: floats under the header while you browse. */
 .ar-bar{pointer-events:none;position:sticky;top:calc(var(--hdr) - 6px);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:10px var(--gutter);margin-bottom:clamp(16px,2.4vh,28px)}
@@ -102,3 +113,51 @@
 @media(max-width:560px){.ar{--hdr:70px}}
 @media(prefers-reduced-motion:reduce){.ar [data-reveal],.ar-line>span{opacity:1;transform:none}.ar-filters:before{transition:none}}
 .ar-img img[data-hd]{filter:contrast(1.03)}
+
+/* Architecture: full-colour renders fill the card edge to edge. */
+.is-arch .ar-img img,.is-arch .ar-img img[data-hd]{width:100%;height:100%;object-fit:cover;mix-blend-mode:normal;filter:none}
+.is-arch .ar-img:before{display:none}
+.is-arch .ar-img small,.ar-views{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:999px;background:#f5f3edd9;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:inset 0 0 0 1px var(--rule);font:500 9.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+.is-arch .ar-img small{left:16px;top:16px}
+.is-arch .ar-img small:before{content:'';width:6px;height:6px;margin-right:8px;border-radius:50%;background:#a16d2f}
+.ar-views{position:absolute;right:16px;top:16px;z-index:3;color:var(--muted)}
+.is-arch .ar-img img{object-position:var(--focus,50% 50%)}
+
+/* Feature: a project alone on its row. The render keeps its own
+   proportions on the left, its story and views sit beside it. */
+.ar-card.is-feature{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,4fr);column-gap:clamp(24px,3.2vw,64px);align-items:end}
+.is-feature .ar-img{height:auto;aspect-ratio:var(--ratio,16/10);max-height:calc(100svh - var(--hdr) - 110px)}
+.is-feature .ar-copy{gap:10px;padding:0 0 6px;padding-right:0}
+.is-feature .ar-num{position:static;order:-1;margin-bottom:clamp(8px,2vh,24px)}
+.is-feature .ar-copy strong{font-size:clamp(30px,2.9vw,52px);line-height:1.02}
+.ar-detail{margin-top:6px;font-size:15px;line-height:1.6;color:var(--muted);max-width:38ch}
+.ar-thumbs{display:flex;gap:8px;margin-top:14px}
+.ar-thumbs img{width:clamp(52px,4.4vw,72px);aspect-ratio:3/2;height:auto;object-fit:cover;border-radius:9px;box-shadow:0 0 0 1px var(--rule);transition:transform .5s var(--ease)}
+.ar-card:hover .ar-thumbs img{transform:translateY(-2px)}
+.ar-card:hover .ar-thumbs img:nth-child(2){transition-delay:.04s}.ar-card:hover .ar-thumbs img:nth-child(3){transition-delay:.08s}.ar-card:hover .ar-thumbs img:nth-child(4){transition-delay:.12s}
+.ar-feature-go{align-self:flex-start;display:inline-flex;align-items:center;gap:10px;height:44px;margin-top:18px;padding:0 18px 0 20px;border-radius:999px;box-shadow:inset 0 0 0 1px #25374133;font-size:14px;font-weight:500;color:var(--ink);transition:background .3s,color .3s,box-shadow .3s}
+.ar-feature-go svg{transition:transform .35s var(--ease)}
+.ar-card:hover .ar-feature-go{background:var(--ink);color:var(--chalk);box-shadow:none}
+.ar-card:hover .ar-feature-go svg{transform:rotate(45deg)}
+.is-feature .ar-open{display:none}
+
+/* Sticky bar wash: paper fades in behind the header and pills once stuck. */
+.ar-bar:before{content:'';position:absolute;left:0;right:0;bottom:-22px;height:calc(100% + 34px);z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,var(--paper) 0%,color-mix(in srgb,var(--paper) 94%,transparent) 72%,transparent);opacity:0;transition:opacity .35s}
+.ar-bar[data-stuck]:before{opacity:1}
+@media(max-width:1100px){.is-arch .ar-grid>li{grid-column:span 6}.is-arch .ar-grid>li:last-child:nth-child(odd){grid-column:span 12}.is-arch .ar-grid>li:nth-child(5n+1):not(:last-child) .ar-img{height:clamp(220px,30vw,340px)}}
+@media(max-width:899px){
+  .ar-card.is-feature{display:flex;align-items:stretch}
+  .is-feature .ar-img{max-height:none}
+  .is-feature .ar-num{position:absolute;order:0;margin:0}
+  .is-feature .ar-copy{padding-right:44px;gap:8px}
+  .is-feature .ar-copy strong{font-size:clamp(21px,1.7vw,28px);line-height:1.1}
+  .ar-detail,.ar-thumbs,.ar-feature-go{display:none}
+  .is-feature .ar-open{display:grid}
+  .ar-filters{--fl:#000;--fr:#000;-webkit-mask-image:linear-gradient(90deg,var(--fl),#000 40px,#000 calc(100% - 40px),var(--fr));mask-image:linear-gradient(90deg,var(--fl),#000 40px,#000 calc(100% - 40px),var(--fr))}
+  .ar-filters[data-start=false]{--fl:transparent}
+  .ar-filters:not([data-end=true]){--fr:transparent}
+}
+/* Phones: every render at its own proportions, nothing cropped. */
+@media(max-width:640px){.is-arch .ar-grid>li,.is-arch .ar-grid>li:last-child:nth-child(odd){grid-column:span 12}.is-arch .ar-grid>li .ar-img{height:auto;aspect-ratio:var(--ratio,16/10)}.ar-switch a{padding:0 12px 0 10px;letter-spacing:.1em}}

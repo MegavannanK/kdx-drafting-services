@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import Archive from '@/components/archive';
 
 export const metadata: Metadata = {
-  title: 'Project archive — KDX Drafting Service',
+  title: 'Steel projects — KDX Drafting Service',
   description: 'Completed steel detailing projects by KDX: residential frames, sheds and industrial structures, shown from our original project models.',
 };
 
 export default function ProjectsPage() {
-  return <Archive/>;
+  return <Archive kind="steel"/>;
 }

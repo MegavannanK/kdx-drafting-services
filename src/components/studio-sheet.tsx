@@ -45,6 +45,17 @@ const DRAWINGS: { title: string; sub: string; scale: string; tone: 'arch' | 'ste
       <VDim y1={58} y2={160} x={210} label="6250"/>
     </>,
   },
+  { // Fabricators: a 310UB40.4 section, true to proportion
+    title: '310UB40.4', sub: 'Section A–A', scale: '1:5', tone: 'steel',
+    art: <>
+      <path className="sh-chain" d="M120 48V170M76 108H164"/>
+      <path className="sh-line sh-fill" d="M93 58H147V63.5H122V152.5H147V158H93V152.5H118V63.5H93Z"/>
+      <path className="sh-thin" d="M118 63.5q0 3 -3 3M122 63.5q0 3 3 3M118 152.5q0 -3 -3 -3M122 152.5q0 -3 3 -3"/>
+      <path className="sh-thin" d="M101 66v2M139 66v2M101 148v2M139 148v2"/>
+      <HDim x1={93} x2={147} y={40} label="165"/>
+      <VDim y1={58} y2={158} x={176} label="304"/>
+    </>,
+  },
   { // Builders: steel portal frame, the place both disciplines meet
     title: 'Portal frame', sub: 'Grid A–B', scale: '1:200', tone: 'both',
     art: <>
@@ -58,17 +69,6 @@ const DRAWINGS: { title: string; sub: string; scale: string; tone: 'arch' | 'ste
       <path className="sh-chain" d="M56 50V172M184 50V172"/>
       <HDim x1={56} x2={184} y={40} label="18000"/>
       <VDim y1={92} y2={160} x={210} label="6000"/>
-    </>,
-  },
-  { // Fabricators: a 310UB40.4 section, true to proportion
-    title: '310UB40.4', sub: 'Section A–A', scale: '1:5', tone: 'steel',
-    art: <>
-      <path className="sh-chain" d="M120 48V170M76 108H164"/>
-      <path className="sh-line sh-fill" d="M93 58H147V63.5H122V152.5H147V158H93V152.5H118V63.5H93Z"/>
-      <path className="sh-thin" d="M118 63.5q0 3 -3 3M122 63.5q0 3 3 3M118 152.5q0 -3 -3 -3M122 152.5q0 -3 3 -3"/>
-      <path className="sh-thin" d="M101 66v2M139 66v2M101 148v2M139 148v2"/>
-      <HDim x1={93} x2={147} y={40} label="165"/>
-      <VDim y1={58} y2={158} x={176} label="304"/>
     </>,
   },
   { // Design teams: a floor plan with door swings and openings

@@ -40,6 +40,8 @@
 .bp-hero.is-revealed .bp-eyebrow,.bp-hero.is-revealed .bp-lede,.bp-hero.is-revealed .bp-actions{opacity:1;transform:none}
 .bp-eyebrow{display:flex;align-items:center;gap:12px;font:500 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin-bottom:28px;transition-delay:1.35s}
 .bp-eyebrow i{width:4px;height:4px;border-radius:50%;background:var(--sky)}
+/* Phones: the two services stay whole, tighter tracking first, then a clean wrap. */
+@media(max-width:560px){.bp-eyebrow{flex-wrap:wrap;row-gap:8px;column-gap:10px;white-space:nowrap;font-size:10px;letter-spacing:.11em}}
 .bp-title{white-space:nowrap;font-size:clamp(54px,6.3vw,124px);font-weight:450;line-height:.9;letter-spacing:-.06em;color:var(--chalk)}
 .bp-title em{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.03em;color:var(--sky);font-size:1.12em;line-height:.8}
 .bp-line{display:block;overflow:hidden;padding:.02em .08em .1em 0;margin-bottom:-.08em}

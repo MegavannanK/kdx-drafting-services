@@ -3,12 +3,28 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
-import { portfolio, projectSrc, type PortfolioProject } from '@/lib/portfolio';
+import { architecture, ARCHIVE_HREF, DISCIPLINE, portfolio, projectSrc, type PortfolioProject } from '@/lib/portfolio';
 import './work.css';
 
-// A spread across the three project types; the rest live in the archive.
-const FEATURED_IDS = ['PRJ2652', 'PRJ2669', 'PRJ2635', 'PRJ2629', 'PRJ2674', 'PRJ2655'];
-export const FEATURED = FEATURED_IDS.map(id => portfolio.find(p => p.id === id)!) as readonly PortfolioProject[];
+// Steel and architecture take turns: odd slides steel (a shed, a home, an
+// industrial frame), even slides architectural. The rest live in the archive.
+const STEEL_IDS = ['PRJ2652', 'PRJ2669', 'PRJ2635'];
+export const FEATURED: readonly PortfolioProject[] = STEEL_IDS.flatMap((id, i) => [portfolio.find(p => p.id === id)!, architecture[i]]);
+
+/** Corner badge naming the discipline: blue for steel, warm for architecture. */
+/** The two archives, steel and architecture, as one split pill. */
+const ArchiveLinks = ({ className, reveal, short }: { className: string; reveal?: boolean; short?: boolean }) =>
+  <nav className={`wk-links ${className}`} aria-label="All projects" data-reveal={reveal || undefined}>
+    {(['steel', 'arch'] as const).map(k => {
+      const label = k === 'steel' ? 'Steel projects' : 'Architectural projects';
+      return <Link key={k} href={ARCHIVE_HREF[k]} className={`wk-link is-${k}`} aria-label={short ? label : undefined}>
+        <i aria-hidden="true"/><span>{short ? (k === 'steel' ? 'Steel' : 'Architecture') : label}</span><b aria-hidden="true"><ArrowUpRight size={15}/></b>
+      </Link>;
+    })}
+  </nav>;
+
+const Kind = ({ item, className = '' }: { item: PortfolioProject; className?: string }) =>
+  <span className={`wk-kind is-${item.kind} ${className}`}><i aria-hidden="true"/>{DISCIPLINE[item.kind]}</span>;
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -16,7 +32,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
  * Third fold. One project at a time on a wide drafting sheet: the model
  * drifts slowly while its name holds the corner, then the next wipes in.
  * A quiet numbered rail replaces the old index, so only one name is ever
- * read at a time. The full set lives on /projects. Phones get a swipe rail.
+ * read at a time. The full sets live on /projects (steel) and /architecture. Phones get a swipe rail.
  */
 export default function Work({ onOpen }: { onOpen: (list: readonly PortfolioProject[], index: number) => void }) {
   const root = useRef<HTMLElement>(null);
@@ -76,7 +92,7 @@ export default function Work({ onOpen }: { onOpen: (list: readonly PortfolioProj
           <span className="wk-line"><span><em>Resolved.</em></span></span>
         </h2>
       </div>
-      <Link href="/projects/" className="wk-button wk-head-cta" data-reveal>All projects<span><ArrowUpRight size={16}/></span></Link>
+      <ArchiveLinks className="wk-head-cta" reveal/>
     </div>
 
     {/* Desktop and tablets: the stage */}
@@ -85,13 +101,14 @@ export default function Work({ onOpen }: { onOpen: (list: readonly PortfolioProj
       onPointerEnter={() => setHold(true)} onPointerLeave={() => setHold(false)}>
       <button type="button" className="wk-stage-hit" onClick={() => onOpen(FEATURED, active)} aria-label={`Enlarge ${project.name}`}/>
 
-      {FEATURED.map((item, i) => <div key={item.id} className={`wk-shot${i === active ? ' is-active' : ''}${i === prev ? ' is-prev' : ''}`} aria-hidden={i !== active}>
+      {FEATURED.map((item, i) => <div key={item.id} className={`wk-shot is-${item.kind}${i === active ? ' is-active' : ''}${i === prev ? ' is-prev' : ''}`} aria-hidden={i !== active}>
         <div className="wk-drift" key={i === active ? `on-${active}` : 'off'}>
-          <img src={projectSrc(item)} data-hd={item.hd || undefined} alt={i === active ? `${item.name}, original KDX steel model` : ''}
+          <img src={projectSrc(item)} data-hd={item.hd || undefined} alt={i === active ? `${item.name}, ${item.kind === 'arch' ? 'KDX architectural project' : 'original KDX steel model'}` : ''}
             loading={i < 2 ? 'eager' : 'lazy'} decoding="async"/>
         </div>
       </div>)}
       <span className="wk-scan" key={`scan-${active}`} aria-hidden="true"/>
+      <Kind key={`kind-${active}`} item={project} className="wk-kind-stage"/>
 
       <figcaption className="wk-cap" key={`cap-${active}`}>
         <span className="wk-cap-meta"><b>{project.id}</b><i/>{project.category}</span>
@@ -103,7 +120,7 @@ export default function Work({ onOpen }: { onOpen: (list: readonly PortfolioProj
         <div className="wk-segs" role="group" aria-label="Featured projects">
           {FEATURED.map((item, i) => <button key={item.id} type="button" className={i === active ? 'is-active' : i < active ? 'is-done' : ''}
             aria-current={i === active} aria-label={`Show ${item.name}`} onClick={() => show(i)}>
-            <span className="wk-seg-label"><b>{pad(i + 1)}</b><span>{item.name}</span></span>
+            <span className="wk-seg-label"><i className={`wk-seg-kind is-${item.kind}`} aria-hidden="true"/><b>{pad(i + 1)}</b><span>{item.name}</span></span>
             <span className="wk-seg-bar">{i === active && <i key={`t-${active}`} onAnimationEnd={() => step(1)}/>}</span>
           </button>)}
         </div>
@@ -117,14 +134,22 @@ export default function Work({ onOpen }: { onOpen: (list: readonly PortfolioProj
 
     {/* Phones: swipeable rail */}
     <div className="wk-rail" ref={rail} onScroll={onRail} data-reveal>
-      {FEATURED.map((item, i) => <button type="button" key={item.id} className="wk-card" onClick={() => onOpen(FEATURED, i)} aria-label={`View ${item.name}`}>
-        <span className="wk-card-img"><img src={projectSrc(item, 'sm')} data-hd={item.hd || undefined} alt="" loading="lazy" decoding="async"/><small>{item.id}</small></span>
+      {FEATURED.map((item, i) => <button type="button" key={item.id} className={`wk-card is-${item.kind}`} onClick={() => onOpen(FEATURED, i)} aria-label={`View ${item.name}`}>
+        <span className="wk-card-img">
+          {/* Wide renders show whole on a tall card; a blurred copy fills the rest. */}
+          {item.kind === 'arch' && <img className="wk-card-blur" src={projectSrc(item, 'sm')} alt="" aria-hidden="true" loading="lazy" decoding="async"/>}
+          <img src={projectSrc(item, 'sm')} data-hd={item.hd || undefined} alt="" loading="lazy" decoding="async"/><Kind item={item}/>
+        </span>
         <span className="wk-card-copy"><span className="wk-meta">{item.category}<i/>{item.location}</span><strong>{item.name}</strong></span>
       </button>)}
     </div>
     <div className="wk-dots" role="group" aria-label="Choose a project">
       {FEATURED.map((item, i) => <button key={item.id} type="button" aria-label={`Show ${item.name}`} aria-current={slide === i} onClick={() => goTo(i)}/>)}
     </div>
-    <Link href="/projects/" className="wk-button wk-mobile-cta">Explore all projects<span><ArrowUpRight size={16}/></span></Link>
+    {/* Phones and tablets: a caption over two compact pills, sized to their words. */}
+    <div className="wk-mobile-cta">
+      <span className="wk-mobile-kicker">All projects</span>
+      <ArchiveLinks className="wk-links-compact" short/>
+    </div>
   </section>;
 }

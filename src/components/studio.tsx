@@ -7,12 +7,12 @@ import './studio.css';
 
 type Kind = 'steel' | 'arch' | 'both';
 
-// Clockwise from top-left: architecture on the left, steel on the right,
-// builders (both) bridging the top.
+// Clockwise from top-left: architecture on the left, steel and builders
+// (both services) on the right.
 const AUDIENCES: readonly { title: string; body: string; service: string; tag: string; kind: Kind }[] = [
   { title: 'Homeowners', body: 'Clear plans for a new home, extension or addition.', service: 'Architectural drafting', tag: 'Architectural drafting', kind: 'arch' },
-  { title: 'Builders', body: 'Buildable drawings, steel and architecture from one desk.', service: 'Both services', tag: 'Steel + architecture', kind: 'both' },
   { title: 'Fabricators', body: 'Shop drawings and NC/DXF data, ready for the workshop.', service: 'Steel detailing', tag: 'Steel detailing', kind: 'steel' },
+  { title: 'Builders', body: 'Buildable drawings, steel and architecture from one desk.', service: 'Both services', tag: 'Steel + architecture', kind: 'both' },
   { title: 'Design teams', body: 'Extra drafting capacity, to your standards and deadlines.', service: 'Architectural drafting', tag: 'Architectural drafting', kind: 'arch' },
 ];
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, ArrowUpRight, X } from 'lucide-react';
 import { projectSrc, type PortfolioProject } from '@/lib/portfolio';
 import './project-lightbox.css';
@@ -21,6 +21,11 @@ export default function ProjectLightbox({ projects, index, onIndex, onClose, enq
   const project = index === null ? null : projects[index];
   const count = projects.length;
   const step = (delta: number) => { if (index !== null) onIndex((index + delta + count) % count); };
+  // Architectural projects carry several views; each project opens on its cover.
+  const [view, setView] = useState(0);
+  useEffect(() => setView(0), [project?.id]);
+  const views = project?.views ?? [];
+  const shown = views[view]?.image ?? project?.image;
 
   useEffect(() => {
     const el = dialog.current;
@@ -46,7 +51,7 @@ export default function ProjectLightbox({ projects, index, onIndex, onClose, enq
   return <dialog ref={dialog} className="lb" aria-labelledby="lb-title" onCancel={onClose} onClose={onClose}
     onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
     {project && <div className="lb-inner">
-      <figure className="lb-stage"
+      <figure className="lb-stage" data-kind={project.kind}
         onTouchStart={event => { touch.current = event.touches[0].clientX; }}
         onTouchEnd={event => {
           if (touch.current === null) return;
@@ -54,8 +59,15 @@ export default function ProjectLightbox({ projects, index, onIndex, onClose, enq
           if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
           touch.current = null;
         }}>
-        <img key={project.id} src={projectSrc(project)} data-hd={project.hd || undefined} alt={`${project.name}, original KDX steel model`}/>
+        <img key={`${project.id}-${shown}`} src={projectSrc(project, 'lg', shown)} data-hd={project.hd || undefined} data-kind={project.kind}
+          alt={`${project.name}, ${project.kind === 'arch' ? `KDX architectural project${views[view] ? `, ${views[view].label.toLowerCase()}` : ''}` : 'original KDX steel model'}`}/>
         <span className="lb-tag">{project.id}</span>
+        {views.length > 1 && <div className="lb-views" role="group" aria-label="Project views">
+          {views.map((v, i) => <button key={v.image} type="button" aria-pressed={i === view} aria-label={v.label} title={v.label} onClick={() => setView(i)}>
+            <img src={projectSrc(project, 'sm', v.image)} alt="" loading="lazy" decoding="async"/>
+          </button>)}
+          <span className="lb-view-label" key={view}>{views[view].label}</span>
+        </div>}
         {count > 1 && <div className="lb-arrows">
           <button type="button" onClick={() => step(-1)} aria-label="Previous project"><ArrowLeft size={18}/></button>
           <button type="button" onClick={() => step(1)} aria-label="Next project"><ArrowRight size={18}/></button>
@@ -69,7 +81,7 @@ export default function ProjectLightbox({ projects, index, onIndex, onClose, enq
         <p className="lb-eyebrow">{project.category}<i/>{project.location}</p>
         <h2 id="lb-title">{project.name}</h2>
         <p className="lb-detail">{project.detail}</p>
-        <p className="lb-note">Original KDX steel model · Completed project</p>
+        <p className="lb-note">{project.kind === 'arch' ? 'KDX architectural drafting · Client project' : 'Original KDX steel model · Completed project'}</p>
         <a className="lb-cta" href={enquire.href} onClick={() => { enquire.onClick?.(); onClose(); }}>Have a similar project?<span><ArrowUpRight size={16}/></span></a>
       </div>
     </div>}

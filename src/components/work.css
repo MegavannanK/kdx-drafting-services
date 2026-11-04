@@ -30,6 +30,18 @@
 .wk-button:hover{transform:translateY(-2px);background:var(--blue);box-shadow:0 18px 40px -16px #2167a38c}
 .wk-button:hover>span{transform:rotate(45deg)}
 
+/* Archive links: one ink capsule split in two, steel and architecture.
+   Dots use the night palette's sky and sand so they read on ink. */
+.wk-links{display:inline-flex;align-items:center;gap:4px;padding:5px;border-radius:999px;background:var(--ink);box-shadow:0 14px 34px -22px #0d1a24a6}
+.wk-link{--k:#8ec9ff;position:relative;display:inline-flex;align-items:center;gap:10px;height:clamp(34px,4.4vh,42px);padding:0 5px 0 16px;border-radius:999px;color:#f2f0ea;font-size:14px;font-weight:500;white-space:nowrap;transition:background .3s}
+.wk-link.is-arch{--k:#e9c79c}
+.wk-link>i{flex:none;width:6px;height:6px;border-radius:50%;background:var(--k);box-shadow:0 0 0 3px color-mix(in srgb,var(--k) 22%,transparent)}
+.wk-link>b{display:grid;place-items:center;width:clamp(28px,3.6vh,32px);aspect-ratio:1;margin-left:4px;border-radius:50%;background:#ffffff14;color:#f2f0ea;transition:background .3s,color .3s,transform .35s var(--ease)}
+.wk-link+.wk-link:before{content:'';position:absolute;left:-3px;top:28%;bottom:28%;width:1px;background:#ffffff1f}
+.wk-link:hover{background:#ffffff12}
+.wk-link:hover>b{background:#f2f0ea;color:var(--ink);transform:rotate(45deg)}
+.wk-link:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+
 /* Stage: a wide drafting sheet. Each shot is opaque, so the next can wipe
    over the last; the model's white ground multiplies into the sheet. */
 .wk-stage-wrap{flex:1;min-height:0;display:flex}
@@ -54,6 +66,25 @@
 .wk-stage-wrap:not(.is-in) .wk-shot.is-active,.wk-stage-wrap:not(.is-in) .is-active .wk-drift img{animation:none}
 .wk-scan{position:absolute;top:0;bottom:0;left:0;width:1px;z-index:3;pointer-events:none;background:var(--blue);box-shadow:0 0 14px 1px #2167a366;opacity:0;animation:wk-scan 1.2s var(--ease)}
 .wk-stage-wrap:not(.is-in) .wk-scan{animation:none}
+
+/* Architectural renders are full-colour photographs, not models on white:
+   they sit as a framed plate on the right, clear of the caption. */
+.wk-shot.is-arch .wk-drift{left:auto;width:58%;top:6%;bottom:17%;right:3%;mix-blend-mode:normal;border-radius:20px;overflow:hidden;
+  box-shadow:0 0 0 1px #25374114,0 30px 60px -34px #0d1a2466,0 10px 24px -18px #0d1a2440}
+.wk-shot.is-arch .wk-drift img,.wk-shot.is-arch .wk-drift img[data-hd]{object-fit:cover;filter:none;transform-origin:50% 50%}
+.wk-shot.is-arch .wk-drift:after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 0 1px #ffffff1f}
+
+/* Discipline badge: a small frosted pill, dot coloured by service. */
+.wk-kind{--k:var(--blue);display:inline-flex;align-items:center;gap:9px;height:30px;padding:0 13px 0 11px;border-radius:999px;
+  background:#f5f3edd9;-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2);
+  box-shadow:inset 0 0 0 1px var(--rule),0 6px 18px -10px #0d1a2440;font:500 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+.wk-kind.is-arch{--k:#a16d2f}
+.wk-kind i{width:7px;height:7px;border-radius:50%;background:var(--k);box-shadow:0 0 0 3px color-mix(in srgb,var(--k) 18%,transparent)}
+.wk-kind-stage{position:absolute;z-index:5;top:clamp(18px,2.6vh,28px);left:clamp(22px,2.6vw,44px);pointer-events:none;animation:wk-fade .8s var(--ease) .3s both}
+.wk-stage-wrap:not(.is-in) .wk-kind-stage{animation:none}
+.wk-seg-kind{flex:none;align-self:center;width:5px;height:5px;border-radius:50%;background:var(--blue);opacity:.55;transition:opacity .3s}
+.wk-seg-kind.is-arch{background:#a16d2f}
+.wk-segs button.is-active .wk-seg-kind,.wk-segs button:hover .wk-seg-kind{opacity:1}
 
 /* Caption: one name at a time, rising in on its own line. */
 .wk-cap{position:absolute;z-index:5;left:clamp(22px,2.6vw,44px);bottom:calc(clamp(64px,9vh,88px) + clamp(10px,2vh,24px));display:flex;flex-direction:column;gap:clamp(8px,1.4vh,14px);max-width:min(34%,440px);pointer-events:none}
@@ -99,6 +130,7 @@
 @media(max-width:1100px){
   .wk{--hdr:76px}
   .wk-drift{width:68%}
+  .wk-shot.is-arch .wk-drift{width:56%}
   .wk-cap{max-width:38%}
   .wk-segs button.is-active{flex-grow:3.4}
 }
@@ -106,6 +138,7 @@
 @media(max-height:760px) and (min-width:900px){
   .wk-cap-loc{display:none}
   .wk-drift{top:4%;bottom:13%}
+  .wk-shot.is-arch .wk-drift{top:5%;bottom:16%}
 }
 @media(max-height:599px) and (min-width:900px){.wk{height:auto}.wk-stage-wrap{flex:none;height:440px}}
 
@@ -124,7 +157,11 @@
   .wk-card-img{position:relative;display:grid;place-items:center;width:100%;height:clamp(220px,min(calc(100svh - var(--hdr) - 370px),96vw),460px);border-radius:22px;overflow:hidden;isolation:isolate;background:var(--sheet);box-shadow:inset 0 0 0 1px var(--rule)}
   .wk-card-img img{width:112%;max-width:none;height:auto;max-height:100%;object-fit:contain;mix-blend-mode:multiply;filter:brightness(1.075) contrast(1.02)}
   .wk-card-img img[data-hd]{filter:contrast(1.03)}
-  .wk-card-img small{position:absolute;left:16px;top:14px;font:500 9.5px var(--mono);letter-spacing:.14em;color:var(--muted)}
+  .wk-card.is-arch .wk-card-img img{position:relative;z-index:1;width:calc(100% - 28px);height:auto;max-height:calc(100% - 28px);object-fit:contain;border-radius:14px;mix-blend-mode:normal;filter:none;
+    box-shadow:0 24px 44px -24px #0d1a24a6,0 0 0 1px #ffffff40}
+  .wk-card.is-arch .wk-card-img img.wk-card-blur{position:absolute;z-index:0;inset:-10%;width:120%;height:120%;max-height:none;border-radius:0;object-fit:cover;filter:blur(30px) saturate(1.2);box-shadow:none}
+  .wk-card.is-arch .wk-card-img:after{content:'';position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 90% 60% at 50% 50%,#f5f3ed59,#f5f3edb3)}
+  .wk-card-img .wk-kind{position:absolute;z-index:2;left:12px;top:12px;height:26px;padding:0 11px 0 9px;gap:7px;font-size:9px}
   .wk-card-copy{display:flex;flex-direction:column;gap:6px;padding:0 4px}
   .wk-card-copy strong{font-size:22px;font-weight:450;letter-spacing:-.03em;color:var(--ink)}
   .wk-meta{display:flex;align-items:center;gap:8px;font:500 9.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;overflow:hidden}
@@ -132,7 +169,14 @@
   .wk-dots{display:flex;justify-content:center;gap:8px;padding:18px 0 4px}
   .wk-dots button{width:18px;height:4px;padding:0;border-radius:4px;background:#25374126;transition:width .4s var(--ease),background .3s}
   .wk-dots button[aria-current=true]{width:36px;background:var(--ink)}
-  .wk-mobile-cta{display:flex;justify-content:space-between;margin-top:clamp(16px,3vh,28px)}
+  .wk-mobile-cta{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:clamp(18px,3.2vh,30px)}
+  .wk-mobile-kicker{font:500 10px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .wk-links-compact{gap:8px;padding:0;background:none;box-shadow:none}
+  .wk-links-compact .wk-link{height:46px;padding:0 5px 0 16px;gap:9px;background:var(--ink);box-shadow:0 12px 26px -18px #0d1a24b3}
+  .wk-links-compact .wk-link>b{width:34px;margin-left:2px}
+  .wk-links-compact .wk-link+.wk-link:before{display:none}
+  .wk-links-compact .wk-link:active{transform:scale(.97)}
+  .wk-links-compact .wk-link{transition:background .3s,transform .2s var(--ease)}
 }
 @media(max-width:800px){.wk{scroll-margin-top:-25px}}
 @media(max-width:560px){.wk{--hdr:70px}}
@@ -140,6 +184,6 @@
 @media(prefers-reduced-motion:reduce){
   .wk-line>span,.wk-eyebrow,.wk-head-cta,.wk-rail{transform:none;opacity:1}
   .wk-stage{clip-path:none}
-  .wk-shot.is-active,.is-active .wk-drift img,.wk-scan,.wk-cap *{animation:none}
+  .wk-shot.is-active,.is-active .wk-drift img,.wk-scan,.wk-cap *,.wk-kind-stage{animation:none}
   .wk-seg-bar i{display:none}
 }

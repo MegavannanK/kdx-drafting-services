@@ -153,7 +153,7 @@ export default function BlueprintHero({ onReveal }: { onReveal?: () => void }) {
     </div>
 
     <div className="bp-content" aria-hidden={!revealed}>
-      <p className="bp-eyebrow">Steel detailing <i/> Architectural drafting</p>
+      <p className="bp-eyebrow">Steel detailing <i/> Architecture design and drafting</p>
       <h1 className="bp-title">
         <span className="bp-line"><span>Drawn to be</span></span>
         <span className="bp-line"><span><em>built.</em></span></span>
