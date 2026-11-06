@@ -154,8 +154,8 @@ function Starfield() {
 
 /**
  * Site footer, shared by every page: a night sky to close the scroll.
- * One calm row of links, a quiet base row, and the wordmark resting at
- * the very end, its lower half dissolving into space.
+ * One calm row of links, the wordmark floating above a base line, with
+ * copyright and place in its two corners.
  */
 export default function SiteFooter({ home = true, onEnquire }: { home?: boolean; onEnquire?: (service: string) => void }) {
   const root = useRef<HTMLElement>(null);
@@ -197,11 +197,6 @@ export default function SiteFooter({ home = true, onEnquire }: { home?: boolean;
         </div>
       </div>
 
-      <p className="sf-copy">
-        <span>© {new Date().getFullYear()} KDX Drafting Service</span>
-        <span>Nowra, NSW · Drafting Australia‑wide</span>
-      </p>
-
       <div className="sf-links">
         <nav aria-label="Explore">
           <span className="sf-kicker">Explore</span>
@@ -238,6 +233,10 @@ export default function SiteFooter({ home = true, onEnquire }: { home?: boolean;
         </button>
       </div>
       <p className="sf-mark" aria-hidden="true"><span>KDX Drafting</span></p>
+      <p className="sf-base">
+        <span>© {new Date().getFullYear()} KDX Drafting Service</span>
+        <span>Nowra, NSW<span className="sf-base-more"> · Drafting Australia‑wide</span></span>
+      </p>
     </div>
   </footer>;
 }
