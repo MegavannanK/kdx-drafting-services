@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
-import StudioSheet from './studio-sheet';
+import StudioSheet, { sheetInfo } from './studio-sheet';
 import './studio.css';
 
 type Kind = 'steel' | 'arch' | 'both';
@@ -15,6 +15,14 @@ const AUDIENCES: readonly { title: string; body: string; service: string; tag: s
   { title: 'Builders', body: 'Buildable drawings, steel and architecture from one desk.', service: 'Both services', tag: 'Steel + architecture', kind: 'both' },
   { title: 'Design teams', body: 'Extra drafting capacity, to your standards and deadlines.', service: 'Architectural drafting', tag: 'Architectural drafting', kind: 'arch' },
 ];
+
+// The phone selector keeps the desktop's two wings: indexes into AUDIENCES.
+const WINGS = [
+  { label: 'Architecture', kind: 'arch', items: [0, 3] },
+  { label: 'Steel', kind: 'steel', items: [1, 2] },
+] as const;
+// Phones auto-advance in reading order across that 2×2 grid.
+const PHONE_ORDER = [0, 1, 3, 2];
 
 const pad = (n: number) => String(n).padStart(2, '0');
 type Pt = { x: number; y: number };
@@ -38,6 +46,10 @@ function wire(h: Pt, n: Pt, half: number) {
  * KDX is the hub; four audiences are wired to it, coloured by the service
  * they draw on. One node is open at a time; its wire draws itself in as
  * the timer, then the next one takes over. Hover holds, click enquires.
+ *
+ * Phones get the same idea on one screen: a blueprint card for the open
+ * audience above a two-wing selector. It keeps advancing on its own; a tap
+ * jumps to that audience and the timer carries on from there.
  */
 export default function Studio({ onEnquire }: { onEnquire: (service: string) => void }) {
   const root = useRef<HTMLElement>(null);
@@ -97,7 +109,10 @@ export default function Studio({ onEnquire }: { onEnquire: (service: string) => 
 
   const playing = inView && !hold;
   const next = () => setActive(a => (a + 1) % AUDIENCES.length);
+  const nextOnPhone = () => setActive(a => PHONE_ORDER[(PHONE_ORDER.indexOf(a) + 1) % PHONE_ORDER.length]);
   const current = AUDIENCES[active];
+  const sheet = sheetInfo(active);
+  const phoneStep = pad(PHONE_ORDER.indexOf(active) + 1);
 
   return <section ref={root} className="st" id="about" aria-labelledby="st-title" onPointerMove={lamp}>
     <div className="st-light" aria-hidden="true"/>
@@ -109,12 +124,12 @@ export default function Studio({ onEnquire }: { onEnquire: (service: string) => 
           <span className="st-line"><span><em>Our full attention.</em></span></span>
         </h2>
       </div>
-      <p className="st-lede" data-reveal>One desk in Nowra for steel and architecture, Australia-wide. A small addition gets the same care as a complex structure.</p>
+      <p className="st-lede" data-reveal>One desk in Nowra for steel and architecture, Australia-wide. <span className="st-lede-more">A small addition gets the same care as a complex structure.</span></p>
     </header>
 
-    <div ref={graph} className="st-graph" data-reveal data-playing={playing} data-kind={current.kind}
+    <div ref={graph} className="st-graph" data-reveal data-playing={playing} data-in-view={inView} data-kind={current.kind}
       onPointerEnter={() => setHold(true)} onPointerLeave={() => setHold(false)}>
-      <p className="st-label"><span>Who we work with</span><span className="st-count"><b key={active}>{pad(active + 1)}</b> / {pad(AUDIENCES.length)}</span></p>
+      <p className="st-label"><span>Who we work with</span><span className="st-count"><b key={active} className="st-n-wide">{pad(active + 1)}</b><b key={`p${active}`} className="st-n-phone">{phoneStep}</b> / {pad(AUDIENCES.length)}</span></p>
 
       {geo && <svg className="st-wires" width={geo.w} height={geo.h} viewBox={`0 0 ${geo.w} ${geo.h}`} aria-hidden="true">
         <defs>
@@ -165,6 +180,33 @@ export default function Studio({ onEnquire }: { onEnquire: (service: string) => 
       </ul>
 
       <p className="st-legend" aria-hidden="true"><span className="st-steel">Steel detailing</span><span className="st-arch">Architectural drafting</span></p>
+
+      <div className={`st-card st-${current.kind}`}>
+        <div className="st-plate">
+          <p className="st-plate-cap" key={active}><b>{sheet.title}</b><span>{sheet.scale} · 04–{phoneStep}</span></p>
+          <StudioSheet index={active} drawingOnly/>
+        </div>
+        <div className="st-card-body">
+          <div key={active} className="st-card-swap">
+            <p className="st-card-tag">{current.tag}</p>
+            <h3 className="st-card-name">{current.title}</h3>
+            <p className="st-card-text">{current.body}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="st-picker" role="group" aria-label="Who we work with">
+        {WINGS.map(wing => <div key={wing.kind} className={`st-wing st-${wing.kind}`} role="group" aria-label={wing.label}>
+          <span className="st-wing-head" aria-hidden="true">{wing.label}</span>
+          {wing.items.map(i => {
+            const item = AUDIENCES[i], on = i === active;
+            return <button key={item.title} type="button" className={`st-pick st-${item.kind}`} aria-pressed={on} onClick={() => setActive(i)}>
+              <i className="st-pick-dot" aria-hidden="true"/>{item.title}
+              {on && <i key={active} className="st-pick-run" aria-hidden="true" onAnimationEnd={nextOnPhone}/>}
+            </button>;
+          })}
+        </div>)}
+      </div>
     </div>
   </section>;
 }

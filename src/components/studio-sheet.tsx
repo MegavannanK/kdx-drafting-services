@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useId, type CSSProperties, type ReactNode } from 'react';
 
 /*
  * The hub of the studio diagram: a small blueprint sheet. Each audience has
@@ -87,14 +87,32 @@ const DRAWINGS: { title: string; sub: string; scale: string; tone: 'arch' | 'ste
   },
 ];
 
-export default function StudioSheet({ index }: { index: number }) {
+/** Sheet details for captions rendered outside the drawing. */
+export const sheetInfo = (index: number) => ({ title: DRAWINGS[index].title, scale: DRAWINGS[index].scale });
+
+/**
+ * `drawingOnly` crops to the drawing itself, without the frame and title
+ * block, so it can fill a card of any proportion on phones. Each sheet has
+ * its own hatch id, as the desktop sheet is display:none on phones and a
+ * pattern can't be referenced from inside hidden content.
+ */
+export default function StudioSheet({ index, drawingOnly = false }: { index: number; drawingOnly?: boolean }) {
   const d = DRAWINGS[index];
-  return <svg className={`sh sh-${d.tone}`} viewBox="0 0 240 240" aria-hidden="true">
-    <defs>
-      <pattern id="sh-hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-        <line x1="0" y1="0" x2="0" y2="4"/>
-      </pattern>
-    </defs>
+  const hatch = `sh-hatch-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  const defs = <defs>
+    <pattern id={hatch} className="sh-hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="4"/>
+    </pattern>
+  </defs>;
+  const style = { '--hatch': `url(#${hatch})` } as CSSProperties;
+
+  if (drawingOnly) return <svg className={`sh sh-${d.tone}`} style={style} viewBox="26 26 196 152" aria-hidden="true">
+    {defs}
+    <g key={index} className="sh-art">{d.art}</g>
+  </svg>;
+
+  return <svg className={`sh sh-${d.tone}`} style={style} viewBox="0 0 240 240" aria-hidden="true">
+    {defs}
     <rect className="sh-frame" x="8" y="8" width="224" height="224" rx="6"/>
     <path className="sh-frame" d="M8 194H232M86 194V232M180 194V232"/>
     <path className="sh-crop" d="M16 22V16H22M218 16H224V22M16 182V188H22M224 182V188H218"/>
