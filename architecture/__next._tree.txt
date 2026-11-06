@@ -1,6 +1,6 @@
 :HL["/kdx-drafting-services/_next/static/chunks/2bflcz0cj61lf.css","style"]
-:HL["/kdx-drafting-services/_next/static/chunks/3aps_5vl6hpyq.css","style"]
+:HL["/kdx-drafting-services/_next/static/chunks/3erojn1819toq.css","style"]
 :HL["/kdx-drafting-services/_next/static/chunks/0nxxe9u401ibb.css","style"]
 2:[["children",{"s":"__PAGE__","h":160}]]
 1:[["children",{"s":"architecture","h":96,"c":"$Q2"}]]
-0:{"b":"BF3DGMisHAqxjdZts9k9I","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"-DXorAl3KFvxo1MTusTgS","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
