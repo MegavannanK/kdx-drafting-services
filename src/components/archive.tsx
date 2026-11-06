@@ -130,6 +130,8 @@ export default function Archive({ kind = 'steel' }: { kind?: Discipline }) {
       </section>
 
       <div ref={sentinel} aria-hidden="true"/>
+      {/* Bounds the sticky bar to the grid, so it leaves before the closing CTA. */}
+      <div>
       <div className="ar-bar" data-reveal data-stuck={stuck || undefined}>
         <div className="ar-filters" role="group" aria-label="Filter projects" ref={group}
           onScroll={e => edges(e.currentTarget)}>
@@ -170,6 +172,7 @@ export default function Archive({ kind = 'steel' }: { kind?: Discipline }) {
         </li>;
         })}
       </ul>
+      </div>
 
       <section className="ar-cta" data-tone="dark" aria-labelledby="ar-cta-title">
         <div data-reveal>
