@@ -81,8 +81,19 @@
 @media(min-width:1800px){.bp-lede{font-size:18px;max-width:380px}.bp-button,.bp-link{font-size:15px}}
 @media(max-height:780px) and (min-aspect-ratio:13/10){.bp-title{font-size:clamp(50px,5.6vw,100px)}.bp-lede{margin-top:24px}.bp-actions{margin-top:28px}.bp-eyebrow{margin-bottom:20px}}
 
-/* Portrait and near-square screens: building above, copy below. */
-@media(max-aspect-ratio:13/10){
+/* Near-square tablets and windows: keep copy and building side by side, with a
+   wider copy column and smaller type so neither crowds the other. */
+@media(min-aspect-ratio:1001/1000) and (max-aspect-ratio:13/10){
+  .bp-shade{background:linear-gradient(180deg,#0a131caa 0%,transparent 18%),linear-gradient(0deg,#0a131ce6 0%,transparent 24%),linear-gradient(90deg,#0a131ce6 0%,#0a131cb3 36%,transparent 60%)}
+  .bp-content{width:44vw}
+  .bp-title{font-size:clamp(44px,7.2vw,96px)}
+  .bp-eyebrow{flex-wrap:wrap;row-gap:8px;margin-bottom:22px}
+  .bp-lede{margin-top:24px;max-width:330px}
+  .bp-actions{margin-top:28px;gap:22px}
+}
+
+/* Portrait screens: building above, copy below. */
+@media(max-aspect-ratio:1/1){
   .bp-shade{background:linear-gradient(180deg,#0a131caa 0%,transparent 16%),linear-gradient(0deg,#0a131c 0%,#0a131cf2 30%,#0a131c99 46%,transparent 60%)}
   .bp-content{top:auto;bottom:96px;left:6%;right:6%;width:auto;max-width:620px;transform:translateY(calc(var(--scroll) * -90px))}
   .bp-title{font-size:clamp(46px,12.4vw,104px)}

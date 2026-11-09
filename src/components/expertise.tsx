@@ -13,7 +13,7 @@ const DISCIPLINES = [
     key: 'steel', index: '01', title: 'Steel detailing', enquiry: 'Steel detailing' as const,
     audience: 'Fabricators · Builders · Engineers',
     intro: 'Every member and connection, resolved for fabrication.',
-    image: '/images/projects/project-03.jpg', caption: 'Actual project model',
+    image: '/images/steel-pavilion.jpg', caption: 'Illustrative concept',
     deliverables: ['3D steel modelling', 'Shop drawings', 'NC & DXF outputs', 'Tender sets'],
     cta: 'Start a steel project',
   },

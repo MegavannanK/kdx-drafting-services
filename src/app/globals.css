@@ -44,3 +44,5 @@
   mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);-webkit-mask-image:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%)}
 .site-header.is-solid:before{opacity:1;background:#f5f3edeb}
 .site-header.is-over-hero.is-scrolled:before{opacity:1;background:#0a131ceb}
+/* Narrow tablets (iPad mini/Air portrait): the pill nav has no room, so use the menu. */
+@media(min-width:801px) and (max-width:960px){.site-header nav{display:none}.site-header nav.nav-open{display:flex;position:absolute;flex-direction:column;gap:0;background:var(--paper);box-shadow:0 15px 20px #20374412;font-size:20px}.mobile-contact{display:flex!important;align-items:center;justify-content:space-between}.menu-toggle{display:grid!important;place-items:center;background:none;min-width:44px;height:44px}.header-cta{margin-left:auto}}

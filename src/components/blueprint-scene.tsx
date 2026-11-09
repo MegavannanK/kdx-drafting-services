@@ -17,6 +17,8 @@ export type SceneProps = {
   revealed: RefObject<boolean>;
   pointer: RefObject<{ x: number; y: number }>;
   scroll: RefObject<number>;
+  /** Free band above the copy on portrait tablets, as fractions of the hero height (null: not measured). */
+  band?: RefObject<{ top: number; bottom: number } | null>;
   running: boolean;
   reduced: boolean;
   revision: number;
@@ -253,9 +255,20 @@ const PACE = .74;
 const HERO_POLAR = 1.1, HERO_AZIMUTH = .6;
 const lerp = THREE.MathUtils.lerp;
 // Screen regions (NDC centre and half-extent) the building is fitted into: [intro, revealed].
-const layoutRects = (wide: boolean): [Rect, Rect] => wide
-  ? [{ cx: 0, cy: -.04, hw: .6, hh: .62 }, { cx: .42, cy: -.05, hw: .52, hh: .6 }]
-  : [{ cx: 0, cy: .04, hw: .9, hh: .42 }, { cx: 0, cy: .43, hw: .9, hh: .27 }];
+// Wide: copy left, building right. Mid (near-square tablets and windows): the same,
+// with a narrower copy column. Tall: building above the copy. On phones the tall
+// band is fixed; on portrait tablets it is the measured space between the header
+// and the copy, so the building grows into the room it has and never meets the text.
+type Layout = 'wide' | 'mid' | 'tall';
+const layoutOf = (w: number, h: number): Layout => w / h > 1.3 ? 'wide' : w / h > 1 ? 'mid' : 'tall';
+const layoutRects = (layout: Layout, w: number, band: { top: number; bottom: number } | null): [Rect, Rect] => {
+  if (layout === 'wide') return [{ cx: 0, cy: -.04, hw: .6, hh: .62 }, { cx: .42, cy: -.05, hw: .52, hh: .6 }];
+  if (layout === 'mid') return [{ cx: 0, cy: -.04, hw: .6, hh: .62 }, { cx: .5, cy: -.02, hw: .46, hh: .6 }];
+  const intro = { cx: 0, cy: .04, hw: .9, hh: .42 };
+  if (w < 601 || !band || band.bottom - band.top < .12) return [intro, { cx: 0, cy: .43, hw: .9, hh: .27 }];
+  const top = 1 - 2 * band.top, bottom = 1 - 2 * band.bottom;
+  return [intro, { cx: 0, cy: (top + bottom) / 2, hw: .8, hh: (top - bottom) / 2 }];
+};
 
 function Film(props: SceneProps & { warm: boolean; onWarm: () => void }) {
   const { camera, size, scene, gl, invalidate } = useThree();
@@ -408,12 +421,11 @@ function Film(props: SceneProps & { warm: boolean; onWarm: () => void }) {
     if (live !== shadowsLive.current) { shadowsLive.current = live; gl.shadowMap.autoUpdate = live; gl.shadowMap.needsUpdate = true; }
 
     // Camera: plan view → sweeping descent → slow, breathing drift, always fitted to a screen region.
-    const wide = size.width / size.height >= 1.3;
     const goal = props.revealed.current ? 1 : 0;
     // Step-aside move: a fixed-length tween (2.6 s) rather than an exponential chase.
     if (layout.current === null || props.reduced) layout.current = goal;
     else layout.current += Math.sign(goal - layout.current) * Math.min(Math.abs(goal - layout.current), dt / 2.6);
-    const [intro, final] = layoutRects(wide);
+    const [intro, final] = layoutRects(layoutOf(size.width, size.height), size.width, props.band?.current ?? null);
     const m = easeSine(clamp01(layout.current));
     const zoom = 1 + props.scroll.current * .18;
     const rect = { cx: lerp(intro.cx, final.cx, m), cy: lerp(intro.cy, final.cy, m), hw: lerp(intro.hw, final.hw, m) * zoom, hh: lerp(intro.hh, final.hh, m) * zoom };

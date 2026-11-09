@@ -24,6 +24,8 @@ export default function BlueprintHero({ onReveal }: { onReveal?: () => void }) {
   const revealedRef = useRef(false);
   const pointer = useRef({ x: 0, y: 0 });
   const scroll = useRef(0);
+  const band = useRef<{ top: number; bottom: number } | null>(null);
+  const content = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLSpanElement>(null);
   const phaseRef = useRef(-1);
   const doneRef = useRef(false);
@@ -93,6 +95,18 @@ export default function BlueprintHero({ onReveal }: { onReveal?: () => void }) {
     // If WebGL is slow to start, never hold the page hostage.
     const fallback = window.setTimeout(() => { if (clock.current === 0) reveal(); }, 4500);
 
+    // Portrait tablets: hand the scene the free band between the header and the copy.
+    const measure = () => {
+      const hero = host.current, copy = content.current;
+      if (!hero || !copy || !hero.clientHeight) return;
+      const h = hero.clientHeight;
+      band.current = { top: 96 / h, bottom: Math.max(96, copy.offsetTop - 32) / h };
+    };
+    const resize = new ResizeObserver(measure);
+    if (host.current) resize.observe(host.current);
+    if (content.current) resize.observe(content.current);
+    measure();
+
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('pointermove', onPointer, { passive: true });
@@ -101,6 +115,7 @@ export default function BlueprintHero({ onReveal }: { onReveal?: () => void }) {
     window.addEventListener('keydown', onKey);
     return () => {
       observer.disconnect();
+      resize.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('pointermove', onPointer);
@@ -140,7 +155,7 @@ export default function BlueprintHero({ onReveal }: { onReveal?: () => void }) {
 
   return <section id="top" ref={host} className={`bp-hero ${state}`} aria-label="KDX Drafting Service">
     <div className="bp-stage" aria-hidden="true">
-      {!failed && <BlueprintScene clock={clock} speed={speed} revealed={revealedRef} pointer={pointer} scroll={scroll} running={running} reduced={reduced} revision={revision} onTick={onTick} onReady={() => setReady(true)} onFailure={() => setFailed(true)}/>}
+      {!failed && <BlueprintScene clock={clock} speed={speed} revealed={revealedRef} pointer={pointer} scroll={scroll} band={band} running={running} reduced={reduced} revision={revision} onTick={onTick} onReady={() => setReady(true)} onFailure={() => setFailed(true)}/>}
     </div>
     <div className="bp-shade" aria-hidden="true"/>
 
@@ -152,7 +167,7 @@ export default function BlueprintHero({ onReveal }: { onReveal?: () => void }) {
       <button type="button" className="bp-skip" onClick={skip} tabIndex={revealed ? -1 : 0}>Skip intro</button>
     </div>
 
-    <div className="bp-content" aria-hidden={!revealed}>
+    <div className="bp-content" ref={content} aria-hidden={!revealed}>
       <p className="bp-eyebrow">Steel detailing <i/> Architecture design and drafting</p>
       <h1 className="bp-title">
         <span className="bp-line"><span>Drawn to be</span></span>

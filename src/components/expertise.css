@@ -40,24 +40,20 @@
 .xp-panel:hover:after{opacity:1}
 .is-steel{--accent:var(--sky)}.is-architecture{--accent:var(--sand)}
 
-/* Media. Steel's model owns the middle row, so the copy can never sit on it.
-   Architecture's photograph fills the card behind a scrim. */
-.xp-media{grid-row:2;grid-column:1;min-height:0;position:relative}
-.xp-media img{width:100%;height:100%;object-fit:cover;transform:scale(1.12);transition:transform 2s var(--ease),filter 1s var(--ease)}
-.xp-split.is-in .xp-media img{transform:scale(1.03)}
-.xp-split.is-in .is-open .xp-media img{transform:scale(1)}
-.is-steel{background:radial-gradient(ellipse at 50% 40%,#132638 0%,var(--panel) 65%)}
-.is-steel:before{content:'';position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(#8ec9ff0c 1px,transparent 1px),linear-gradient(90deg,#8ec9ff0c 1px,transparent 1px);background-size:40px 40px;
-  mask-image:radial-gradient(ellipse at 50% 40%,#000 15%,transparent 72%);-webkit-mask-image:radial-gradient(ellipse at 50% 40%,#000 15%,transparent 72%)}
-.is-steel .xp-media{margin:0 clamp(18px,3%,48px);mix-blend-mode:screen}
-.is-steel .xp-media img{object-fit:contain;filter:invert(1) hue-rotate(180deg) saturate(.85) brightness(1.05)}
-.is-steel:not(.is-open) .xp-media img{filter:invert(1) hue-rotate(180deg) saturate(.5) brightness(.8)}
-.is-architecture .xp-media{grid-row:1/-1;transform:translateY(calc((var(--p) - .5) * -30px)) scale(1.04)}
-.is-architecture .xp-media img{object-position:62% 40%;filter:saturate(.95) brightness(.92)}
-.is-architecture:not(.is-open) .xp-media img{filter:saturate(.6) brightness(.6)}
-.xp-scrim{grid-row:1/-1;grid-column:1;pointer-events:none;position:relative;z-index:1}
-.is-architecture .xp-scrim{background:linear-gradient(180deg,#0a131c8c 0%,transparent 20%,transparent 36%,#0a131cd0 66%,#0a131c 100%)}
+/* Media: each render owns the top of its card and dissolves into the panel,
+   so the copy below always sits on clear ground, never over the building. */
+.xp-media{grid-row:1/3;grid-column:1;min-height:0;position:relative;overflow:hidden;
+  mask-image:linear-gradient(180deg,#000 0,#000 58%,#0008 80%,transparent 100%);-webkit-mask-image:linear-gradient(180deg,#000 0,#000 58%,#0008 80%,transparent 100%)}
+.xp-media img{width:100%;height:100%;object-fit:cover;transform:translateY(calc((var(--p) - .5) * -16px)) scale(1.12);transition:transform 2s var(--ease),filter 1s var(--ease)}
+.xp-split.is-in .xp-media img{transform:translateY(calc((var(--p) - .5) * -16px)) scale(1.07)}
+.xp-split.is-in .is-open .xp-media img{transform:translateY(calc((var(--p) - .5) * -16px)) scale(1.04)}
+.is-steel .xp-media img{object-position:46% 18%;filter:saturate(1.02) brightness(1)}
+.is-architecture .xp-media img{object-position:62% 30%;filter:saturate(.95) brightness(.92)}
+.xp-panel:not(.is-open) .xp-media img{filter:saturate(.6) brightness(.6)}
+.xp-scrim{grid-row:1/3;grid-column:1;pointer-events:none;position:relative;z-index:1;
+  background:linear-gradient(180deg,#0a131c99 0%,transparent 26%)}
+/* A faint wash of each discipline's colour under the copy ties panel and image together. */
+.xp-panel{background:radial-gradient(120% 60% at 30% 100%,color-mix(in srgb,var(--accent) 7%,transparent),transparent 70%),var(--panel)}
 
 .xp-sweep{position:absolute;top:0;bottom:0;left:0;width:1px;z-index:2;pointer-events:none;background:linear-gradient(180deg,transparent,var(--accent) 30%,var(--accent) 70%,transparent);box-shadow:0 0 18px var(--accent);opacity:0;animation:xp-sweep 1.4s var(--ease) .1s}
 
@@ -70,7 +66,7 @@
 .xp-panel:not(.is-open) .xp-caption,.xp-panel:not(.is-open) .xp-index small{opacity:0}
 
 /* Body */
-.xp-body{grid-row:3;grid-column:1;position:relative;z-index:2;padding:0 clamp(24px,2.6vw,46px) clamp(22px,3.4vh,42px);max-width:680px}
+.xp-body{grid-row:3;grid-column:1;position:relative;z-index:2;padding:clamp(4px,1vh,12px) clamp(24px,2.6vw,46px) clamp(22px,3.4vh,42px);max-width:680px}
 .xp-body h3{font-size:clamp(28px,min(2.9vw,5.2vh),56px);font-weight:450;line-height:1.02;letter-spacing:-.045em;text-wrap:balance}
 .xp-intro{margin-top:clamp(6px,1vh,12px);font-size:15px;line-height:1.55;color:var(--soft)}
 
@@ -113,6 +109,12 @@
 
 @keyframes xp-sweep{0%{left:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:100%;opacity:0}}
 
+/* Wide screens: deliverables run as one row, handing the height back to the render. */
+@media(min-width:1280px){
+  .xp-list{grid-template-columns:repeat(4,max-content);column-gap:clamp(18px,1.8vw,32px)}
+  .xp-list li{padding-right:4px}
+  .xp-body{max-width:900px}
+}
 /* Short laptop screens: keep the essentials, drop the list. */
 @media(max-height:760px) and (min-width:900px){
   .xp-list{display:none}
@@ -122,38 +124,60 @@
 /* Very short windows: stop forcing one screen rather than crushing the panels. */
 @media(max-height:599px) and (min-width:900px){.xp{height:auto}.xp-split{flex:none;height:440px}}
 
-/* Phones and portrait tablets: a swipeable pair of cards that fits the screen. */
+/* Phones and portrait tablets: the fold still fits exactly one screen. The two
+   cards share one grid (subgrid), so their image, title and copy rows line up
+   and both cards are always the same height. The render takes whatever height
+   is left once the copy is laid out, and the copy never sits on it. */
 @media(max-width:899px){
-  .xp{height:auto;min-height:100svh;--gutter:6%}
-  .xp-title{font-size:clamp(34px,9.6vw,64px);line-height:1.04}
-  .xp-split{flex:none;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
-    margin:0 calc(var(--gutter) * -1);padding:0 var(--gutter);scroll-padding:0 var(--gutter);
-    height:clamp(340px,calc(100svh - var(--hdr) - 270px),620px)}
+  .xp{--gutter:6%;height:100svh;min-height:560px;
+    padding:calc(var(--hdr) + clamp(4px,1.6vh,18px)) var(--gutter) clamp(14px,2.6vh,28px)}
+  .xp-head{margin-bottom:clamp(12px,2.2vh,24px)}
+  .xp-eyebrow{margin-bottom:clamp(6px,1.2vh,14px)}
+  .xp-title{font-size:clamp(30px,min(9.6vw,5.6vh),64px);line-height:1.04}
+
+  .xp-split{flex:1;min-height:0;display:grid;grid-auto-flow:column;grid-auto-columns:min(84%,460px);
+    grid-template-rows:auto minmax(0,1fr) auto;column-gap:12px;
+    overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;
+    margin:0 calc(var(--gutter) * -1);padding:0 var(--gutter);scroll-padding:0 var(--gutter)}
   .xp-split::-webkit-scrollbar{display:none}
-  .xp-panel{flex:0 0 min(86%,440px);scroll-snap-align:start;border-radius:22px}
-  .xp-panel.is-open{flex-grow:0}
-  .xp-media img{transform:none!important}
-  .is-steel .xp-media{margin:0 16px}
-  .is-architecture .xp-media{transform:none}
-  .xp-top{padding:16px 18px}
+  .xp-panel{grid-row:1/-1;grid-template-rows:auto minmax(0,1fr) auto;scroll-snap-align:start;border-radius:22px}
+  @supports(grid-template-rows:subgrid){.xp-panel{grid-template-rows:subgrid}}
+
+  .xp-media{mask-image:linear-gradient(180deg,#000 0,#000 72%,transparent 100%);-webkit-mask-image:linear-gradient(180deg,#000 0,#000 72%,transparent 100%)}
+  .xp-media,.xp-media img{transform:none!important}
+  .is-steel .xp-media img{object-position:42% 40%}
+  .is-architecture .xp-media img{object-position:68% 40%}
+  .xp-top{padding:14px 18px}
   .xp-caption,.xp-index small{display:none}
-  .xp-body{padding:0 20px 20px}
-  .xp-body h3{font-size:clamp(28px,7.6vw,40px)}
-  .xp-intro{font-size:14px}
-  .xp-list{min-width:0;column-gap:14px;margin:14px 0 16px}
-  .xp-list li{font-size:13px;gap:8px;padding:9px 0;white-space:normal}
-  .xp-dots{display:flex;justify-content:center;gap:8px;padding:14px 0 4px}
+
+  .xp-body{max-width:none;padding:2px 20px clamp(16px,2.4vh,22px)}
+  /* Titles share a top line and buttons share a bottom line, whatever the title wraps to. */
+  .xp-body{display:flex;flex-direction:column}
+  .xp-more{margin-top:auto}
+  .xp-body h3{font-size:clamp(26px,min(7.4vw,4.4vh),40px)}
+  .xp-intro{font-size:14px;line-height:1.5;margin-top:6px}
+  /* Deliverables become quiet chips instead of a ruled table. */
+  .xp-list{display:flex;flex-wrap:wrap;gap:6px;min-width:0;margin:12px 0 14px}
+  .xp-list li{padding:6px 11px;border:0;border-radius:999px;background:#ffffff08;box-shadow:inset 0 0 0 1px var(--rule);font-size:12px;color:var(--soft)}
+  .xp-list span{display:none}
+  .xp-button{height:46px;font-size:14px}
+  .xp-more>div{padding-top:0}
+
+  .xp-dots{display:flex;flex:none;justify-content:center;gap:8px;padding:clamp(10px,1.6vh,16px) 0 0}
   .xp-dots button{width:22px;height:4px;padding:0;border-radius:4px;background:#ffffff26;transition:width .4s var(--ease),background .3s}
   .xp-dots button[aria-current=true]{width:40px;background:var(--chalk)}
-  .xp-both{margin-top:12px;padding:0;box-shadow:none;background:none}
+  .xp-both{margin-top:clamp(10px,1.6vh,16px);padding:0;box-shadow:none;background:none}
   .xp-both p{display:none}
-  .xp-both .xp-button{width:100%;justify-content:space-between;font-size:14px}
+  .xp-both .xp-button{width:100%;justify-content:space-between}
   .xp-both .xp-button em{display:inline}
 }
 @media(max-width:800px){.xp{scroll-margin-top:-25px}}
 @media(max-width:560px){.xp{--hdr:70px}}
-@media(max-width:899px) and (max-height:720px){.xp-list{display:none}.xp-more>div{padding-top:14px}}
-@media(max-width:899px) and (max-height:700px){.xp-title{font-size:clamp(30px,8.4vw,44px)}.xp-eyebrow{margin-bottom:6px}.xp-head{margin-bottom:12px}}
+/* Shorter phones: the chips go first, then the intro, so the render keeps its room. */
+@media(max-width:899px) and (max-height:780px){.xp-list{display:none}.xp-more>div{padding-top:14px}}
+@media(max-width:899px) and (max-height:640px){.xp-intro{display:none}.xp-more>div{padding-top:12px}}
+/* Landscape phones: too short for one screen, so let it scroll at a sane height. */
+@media(max-width:899px) and (max-height:559px){.xp{height:auto}.xp-split{flex:none;height:420px}}
 
 @media(prefers-reduced-motion:reduce){
   .xp *,.xp-panel{transition:none!important;animation:none!important}
