@@ -14,6 +14,10 @@ export type PortfolioProject = {
   ratio?: number;
   /** object-position for the cover when a card must crop it. */
   focus?: string;
+  /** A studio design concept (illustrative render), not a client project. */
+  concept?: boolean;
+  /** Pixel widths of the -sm and full stills, when they differ from 1200/2400. */
+  widths?: readonly [number, number];
 };
 
 export const portfolio: readonly PortfolioProject[] = ([
@@ -36,6 +40,16 @@ export const architecture: readonly PortfolioProject[] = [
     views: [{ image: 'mulgowrie-crescent', label: 'Option 02' }, { image: 'mulgowrie-crescent-op2-front', label: 'Option 02, street' }, { image: 'mulgowrie-crescent-op1', label: 'Option 01' }, { image: 'mulgowrie-crescent-op1-front', label: 'Option 01, street' }], detail: 'An addition and alteration to a 35-year-old Sydney home, adding modern architecture while keeping its views to the outdoors. Taken through to DA with the client and town planner.' },
   { id: 'Modular home', name: 'Prefab Studio Module', location: 'Perth, WA', category: 'Design & documentation', image: 'modular-studio', hd: true, kind: 'arch', ratio: 2400 / 1340, focus: '36% 64%',
     views: [{ image: 'modular-studio', label: 'Render' }, { image: 'modular-studio-sketchup', label: 'SketchUp model' }, { image: 'modular-studio-revit', label: 'Revit model' }, { image: 'modular-studio-interior', label: 'Interior study' }], detail: 'Design and documentation for building approval of a prefabricated studio module, built by a modular home company. A compact studio sized for a single person or a couple.' },
+  // Studio concepts: illustrative renders exploring form, material and site.
+  // Portrait stills (1024 x 1536); listed after client work and shown as a trio.
+  ...([
+    { id: 'Concept 01', name: 'Brick Arcade Studios', location: 'Corner site', image: 'concept-brick-arcade', focus: '50% 58%',
+      detail: 'A two-storey workplace on a street corner. Pale brick arches at ground level, a clerestory band under a floating curved roof, and planted ledges that soften the street edge.' },
+    { id: 'Concept 02', name: 'Split-Level Street House', location: 'Sloping block', image: 'concept-split-level', focus: '50% 48%',
+      detail: 'A family home stepped into a rising block: garage and garden room at street level, two living floors above, with glazed balconies and timber fins facing the view.' },
+    { id: 'Concept 03', name: 'Hillside Bushland Retreat', location: 'Bush block', image: 'concept-hillside', focus: '50% 42%',
+      detail: 'A weatherboard home set high on a steep, treed site. Garage and carport stay at the street, and a winding stair climbs through native planting to a wraparound deck.' },
+  ] as const).map(p => ({ ...p, category: 'Concept design', hd: true, kind: 'arch' as const, concept: true, ratio: 1024 / 1536, widths: [768, 1024] as const })),
 ];
 
 export const DISCIPLINE: Record<Discipline, string> = { steel: 'Steel detailing', arch: 'Architectural' };
@@ -48,7 +62,7 @@ export const projectSrc = (project: PortfolioProject, size: 'lg' | 'sm' = 'lg', 
 
 /** Responsive sources: the 1200px still for small slots, the full one for large or dense screens. */
 export const projectSrcSet = (project: PortfolioProject, image = project.image) => project.hd
-  ? `${projectSrc(project, 'sm', image)} 1200w, ${projectSrc(project, 'lg', image)} 2400w`
+  ? `${projectSrc(project, 'sm', image)} ${project.widths?.[0] ?? 1200}w, ${projectSrc(project, 'lg', image)} ${project.widths?.[1] ?? 2400}w`
   : undefined;
 
 /** Where each discipline's full archive lives. */

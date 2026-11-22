@@ -51,7 +51,7 @@ export default function ProjectLightbox({ projects, index, onIndex, onClose, enq
   return <dialog ref={dialog} className="lb" aria-labelledby="lb-title" onCancel={onClose} onClose={onClose}
     onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
     {project && <div className="lb-inner">
-      <figure className="lb-stage" data-kind={project.kind}
+      <figure className="lb-stage" data-kind={project.kind} data-tall={(project.ratio ?? 2) < 1 || undefined}
         onTouchStart={event => { touch.current = event.touches[0].clientX; }}
         onTouchEnd={event => {
           if (touch.current === null) return;
@@ -60,7 +60,7 @@ export default function ProjectLightbox({ projects, index, onIndex, onClose, enq
           touch.current = null;
         }}>
         <img key={`${project.id}-${shown}`} src={projectSrc(project, 'lg', shown)} data-hd={project.hd || undefined} data-kind={project.kind}
-          alt={`${project.name}, ${project.kind === 'arch' ? `KDX architectural project${views[view] ? `, ${views[view].label.toLowerCase()}` : ''}` : 'original KDX steel model'}`}/>
+          alt={`${project.name}, ${project.concept ? 'KDX design concept, illustrative render' : project.kind === 'arch' ? `KDX architectural project${views[view] ? `, ${views[view].label.toLowerCase()}` : ''}` : 'original KDX steel model'}`}/>
         <span className="lb-tag">{project.id}</span>
         {views.length > 1 && <div className="lb-views" role="group" aria-label="Project views">
           {views.map((v, i) => <button key={v.image} type="button" aria-pressed={i === view} aria-label={v.label} title={v.label} onClick={() => setView(i)}>
@@ -81,7 +81,7 @@ export default function ProjectLightbox({ projects, index, onIndex, onClose, enq
         <p className="lb-eyebrow">{project.category}<i/>{project.location}</p>
         <h2 id="lb-title">{project.name}</h2>
         <p className="lb-detail">{project.detail}</p>
-        <p className="lb-note">{project.kind === 'arch' ? 'KDX architectural drafting · Client project' : 'Original KDX steel model · Completed project'}</p>
+        <p className="lb-note">{project.concept ? 'KDX studio concept · Illustrative render' : project.kind === 'arch' ? 'KDX architectural drafting · Client project' : 'Original KDX steel model · Completed project'}</p>
         <a className="lb-cta" href={enquire.href} onClick={() => { enquire.onClick?.(); onClose(); }}>Have a similar project?<span><ArrowUpRight size={16}/></span></a>
       </div>
     </div>}

@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from 'react';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
-import { architecture, ARCHIVE_HREF, DISCIPLINE, portfolio, projectSrc, projectSrcSet, type Discipline } from '@/lib/portfolio';
+import { architecture, ARCHIVE_HREF, DISCIPLINE, portfolio, projectSrc, projectSrcSet, type Discipline, type PortfolioProject } from '@/lib/portfolio';
 import ProjectLightbox from './project-lightbox';
 import SiteFooter from './site-footer';
 import SiteHeader from './site-header';
@@ -25,19 +25,38 @@ const PAGES = {
     lede: 'Completed steel detailing for homes, sheds and industrial structures, captured from our original project models.',
   },
   arch: {
-    list: architecture, filters: ['All projects', 'New build', 'Addition & alteration', 'Design & documentation'], crumb: 'Architectural projects',
+    list: architecture, filters: ['All projects', 'New build', 'Addition & alteration', 'Design & documentation', 'Concept design'], crumb: 'Architectural projects',
     title: ['Every space,', 'considered.'], service: 'architecture',
     lede: 'Architectural design and documentation for new homes, additions and modular builds, from first concept to DA and BA sets.',
   },
 } as const;
 
 // Editorial rhythm on a 12-column grid. Steel: a wide pair, then a row of
-// three. Architecture's photographs stay wide: 7/5, then 5/7, and a project
-// left alone on its row takes the full width.
-function span(i: number, total: number, kind: Discipline) {
-  if (kind === 'arch') return i === total - 1 && i % 2 === 0 ? 12 : [7, 5, 5, 7][i % 4];
-  if (total <= 2) return 6;
-  return [7, 5, 4, 4, 4][i % 5];
+// three. Architecture's landscape renders stay wide: 7/5, then 5/7, and one
+// left alone in its run becomes a full-width feature. Portrait concepts sit
+// side by side as a trio of tall cards. `tab` is the tablet span.
+type Slot = { span: number; tab: number; feature: boolean; tall: boolean };
+function layout(list: readonly PortfolioProject[], kind: Discipline): Slot[] {
+  if (kind === 'steel') return list.map((_, i) => {
+    const span = list.length <= 2 ? 6 : [7, 5, 4, 4, 4][i % 5];
+    return { span, tab: 6, feature: false, tall: false };
+  });
+  const tall = (p: PortfolioProject) => (p.ratio ?? 1.6) < 1;
+  return list.map((p, i) => {
+    // Position within the run of same-orientation projects this one belongs to.
+    let start = i, end = i;
+    while (start > 0 && tall(list[start - 1]) === tall(p)) start--;
+    while (end < list.length - 1 && tall(list[end + 1]) === tall(p)) end++;
+    const at = i - start, last = i === end;
+    if (tall(p)) {
+      const alone = at % 3 === 0 && last;
+      const pair = (end - start + 1) % 3 === 2 && at >= end - start - 1;
+      const span = alone ? 12 : pair ? 6 : 4;
+      return { span, tab: span, feature: alone, tall: true };
+    }
+    const alone = last && at % 2 === 0;
+    return { span: alone ? 12 : [7, 5, 5, 7][at % 4], tab: alone ? 12 : 6, feature: alone, tall: false };
+  });
 }
 
 /** The full archive for one discipline, filterable, opening into the lightbox. */
@@ -51,6 +70,9 @@ export default function Archive({ kind = 'steel' }: { kind?: Discipline }) {
   const sentinel = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
   const list = all.filter(p => filter === 'All projects' || p.category === filter);
+  const slots = layout(list, kind);
+  // Where client work gives way to studio concepts, a quiet label says so.
+  const firstConcept = list.findIndex(p => p.concept);
   const countOf = (f: string) => f === 'All projects' ? all.length : all.filter(p => p.category === f).length;
 
   // Slide the filter's highlight under the active pill.
@@ -142,16 +164,19 @@ export default function Archive({ kind = 'steel' }: { kind?: Discipline }) {
 
       <ul className="ar-grid" key={filter}>
         {list.map((project, i) => {
-          const full = span(i, list.length, kind) === 12;
-          // A lone architectural project reads as a feature: the render at its own
-          // proportions beside its story, never stretched across the page.
-          const feature = full && kind === 'arch';
-          return <li key={project.id} className={full ? 'is-full' : undefined} data-reveal
-            style={{ '--span': span(i, list.length, kind), '--i': i % 5, ...(project.ratio ? { '--ratio': project.ratio } : {}), ...(project.focus ? { '--focus': project.focus } : {}) } as React.CSSProperties}>
-          <button type="button" className={`ar-card${feature ? ' is-feature' : ''}`} onClick={() => setOpen(i)} onPointerMove={spotlight} aria-label={`View ${project.name}`}>
+          const { span, tab, feature, tall } = slots[i];
+          const full = span === 12;
+          return <Fragment key={project.id}>
+          {i === firstConcept && <li className="ar-divider" data-reveal>
+            <p className="ar-divider-eyebrow"><i/>Studio concepts<span>{pad(list.filter(p => p.concept).length)}</span></p>
+          </li>}
+          <li className={full ? 'is-full' : undefined} data-reveal
+            style={{ '--span': span, '--span-t': tab, '--i': i % 5, ...(project.ratio ? { '--ratio': project.ratio } : {}), ...(project.focus ? { '--focus': project.focus } : {}) } as React.CSSProperties}>
+          <button type="button" className={`ar-card${feature ? ' is-feature' : ''}${tall ? ' is-tall' : ''}${project.concept ? ' is-concept' : ''}`} onClick={() => setOpen(i)} onPointerMove={spotlight} aria-label={`View ${project.name}`}>
             <span className="ar-img">
               <img src={projectSrc(project, 'sm')} srcSet={projectSrcSet(project)} data-hd={project.hd || undefined} alt="" loading={i < 2 ? 'eager' : 'lazy'} decoding="async"
-                sizes={feature ? '(max-width: 899px) 92vw, 64vw' : full ? '92vw' : '(max-width: 640px) 92vw, (max-width: 1100px) 46vw, 58vw'}/>
+                sizes={tall ? (feature ? '(max-width: 640px) 92vw, 40vw' : span === 6 ? '(max-width: 640px) 92vw, 46vw' : '(max-width: 640px) 92vw, 30vw')
+                  : feature ? '(max-width: 899px) 92vw, 64vw' : full ? '92vw' : '(max-width: 640px) 92vw, (max-width: 1100px) 46vw, 58vw'}/>
               <small>{project.id}</small>
               {project.views && <span className="ar-views">{pad(project.views.length)} views</span>}
               <span className="ar-open" aria-hidden="true"><ArrowUpRight size={18}/></span>
@@ -169,7 +194,8 @@ export default function Archive({ kind = 'steel' }: { kind?: Discipline }) {
               </>}
             </span>
           </button>
-        </li>;
+        </li>
+        </Fragment>;
         })}
       </ul>
       </div>

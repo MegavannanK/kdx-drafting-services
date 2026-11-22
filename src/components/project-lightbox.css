@@ -63,3 +63,7 @@
 .lb-view-label{padding:0 10px 0 6px;font:500 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#253741;white-space:nowrap;animation:lb-copy .5s var(--ease)}
 @media(max-width:899px){.lb-views{left:10px;bottom:10px;gap:4px;padding:4px}.lb-views button{width:44px;height:30px}.lb-view-label{display:none}}
 @media(max-width:899px){.lb-stage[data-kind=arch]{aspect-ratio:1/1}.lb-stage img[data-kind=arch]{max-width:calc(100% - 24px);max-height:calc(100% - 136px);margin:60px 0 76px;border-radius:12px}}
+
+/* Portrait concepts: no view strip below, so the render takes the sheet's full height. */
+.lb-stage[data-tall] img[data-kind=arch]{max-height:calc(100svh - 48px - 20px - 56px);margin:0}
+@media(max-width:899px){.lb-stage[data-kind=arch][data-tall]{aspect-ratio:4/5}.lb-stage[data-tall] img[data-kind=arch]{max-height:calc((100vw - 40px) * 1.25 - 120px);margin:60px 0}}
